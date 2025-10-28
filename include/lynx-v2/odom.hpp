@@ -157,5 +157,5 @@ namespace lynx {
         inline double get_total_distance() { return total_distance; }
         inline void reset_distance() { total_distance = 0.0; delta_distance = 0.0; }
 
-    }; // namespace odom
+    }; // class odom
 } // namespace lynx
