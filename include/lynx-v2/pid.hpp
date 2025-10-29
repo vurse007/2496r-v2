@@ -39,7 +39,7 @@ namespace lynx {
         double count_range;
         double settle_timer_target;
 
-        timer settle_timer;
+        util::timer settle_timer;
 
         inline PID(constants g, constants r, double rr, double it, double mi, double db, double cr, double st):
             general_constants(g), refined_constants(r), refined_range(rr), integral_threshold(it), max_integral(mi), deadband(db), count_range(cr), settle_timer_target(st) {}
