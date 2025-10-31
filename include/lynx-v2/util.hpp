@@ -99,6 +99,16 @@ namespace lynx {
             return angle;
         }
 
+        double pods_to_inches(double ticks, std::string wheel_type) { 
+            if (wheel_type == "odom"){
+                return (ticks / 36000.0) * (M_PI * global::odom.odom_wheel_diameter); 
+            }
+            else if (wheel_type == "motor"){
+                return (ticks / 300.0) * (M_PI * global::chassis.wheel_diameter);
+            }
+            return 0.0;
+        }
+
         float to_rad(float angle){
             return (angle/(180/M_PI));
         }

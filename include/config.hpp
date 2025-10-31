@@ -16,16 +16,16 @@ namespace global {
         3.25, //wheel diameter in inches
         0.75, //external gear ratio
         12.0, //track width in inches
-        imu,
-        vertical_pod
+        &imu,
+        &vertical_pod
     };
 
     inline lynx::odometry odom{
         1,
         0,
         0,
-        horizontal_pod,
-        vertical_pod
+        &horizontal_pod,
+        &vertical_pod
     };
 
 }

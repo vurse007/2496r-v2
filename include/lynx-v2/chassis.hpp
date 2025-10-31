@@ -84,10 +84,10 @@ namespace lynx {
             const double external_gear_ratio;
             const double track_width;
 
-            pros::Imu& imu;
-            pros::Rotation& distance_pod;
+            pros::Imu* imu;
+            pros::Rotation* distance_pod;
 
-            drive(const std::vector<motor_specs>& ls, const std::vector<motor_specs>& rs, const double wd, const double egr, const double tw, pros::Imu& imu, pros::Rotation& distance_pod):
+            drive(const std::vector<motor_specs>& ls, const std::vector<motor_specs>& rs, const double wd, const double egr, const double tw, pros::Imu* imu, pros::Rotation* distance_pod):
                 left(ls), right(rs), wheel_diameter(wd), external_gear_ratio(egr), track_width(tw), imu(imu), distance_pod(distance_pod) {}
 
             // helper functions to do common tasks to motors
@@ -104,6 +104,22 @@ namespace lynx {
             void tare() {
                 left.tare();
                 right.tare();
+            }
+
+            double get_position(){
+                if (distance_pod == nullptr){
+                    return (left.get_avg_pos() + right.get_avg_pos()) / 2.0;
+                } else {
+                    return distance_pod->get_position();
+                }
+            }
+
+            double get_left_pos(){
+                return left.get_avg_pos();
+            }
+
+            double get_right_pos(){
+                return right.get_avg_pos();
             }
 
             void apply_to_chassis(const std::function<void(std::shared_ptr<pros::Motor>)>& func) {

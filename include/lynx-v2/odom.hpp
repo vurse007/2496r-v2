@@ -33,11 +33,11 @@ namespace lynx {
         double odom_horizontal_offset;
         double odom_vertical_offset;
 
-        pros::Rotation& horizontal_pod;
-        pros::Rotation& vertical_pod;
+        pros::Rotation* horizontal_pod;
+        pros::Rotation* vertical_pod;
 
         //constructor
-        odometry(double odwheeldiam, double h_offset, double v_offset, pros::Rotation& h_pod, pros::Rotation& v_pod):
+        odometry(double odwheeldiam, double h_offset, double v_offset, pros::Rotation* h_pod, pros::Rotation* v_pod):
             odom_wheel_diameter(odwheeldiam),
             odom_horizontal_offset(h_offset),
             odom_vertical_offset(v_offset),
@@ -88,7 +88,7 @@ namespace lynx {
                 : 0.0;
 
             // Read current sensor values
-            read_sensors(horizontal_pod, vertical_pod, global::chassis.imu);
+            read_sensors(*horizontal_pod, *vertical_pod, *global::chassis.imu);
 
             // Compute offset so that θ = desired_deg now
             imu_heading_offset_deg = theta_deg - desired_deg;
@@ -105,7 +105,7 @@ namespace lynx {
 
         inline void update() {
             // 1) Read sensors
-            read_sensors(horizontal_pod, vertical_pod, global::chassis.imu);
+            read_sensors(*horizontal_pod, *vertical_pod, *global::chassis.imu);
 
             // 2) Heading with offset (in field frame)
             const double theta_prev = current_pos.theta;
