@@ -2,13 +2,12 @@
 #include "main.h"
 
 namespace lynx {
-
     struct motor_specs {
         int port;
-        pros::motor_gearset_e_t gearset;
+        pros::v5::MotorGears gearset;
 
-        motor_specs(int p, pros::motor_gearset_e_t g):
-            port(p), gearset(g) {}
+        motor_specs(int p, pros::v5::MotorGears g)
+            : port(p), gearset(g) {}
     };
 
     class group {

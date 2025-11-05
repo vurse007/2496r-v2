@@ -8,7 +8,11 @@
  * to keep execution time for this mode under a few seconds.
  */
 void initialize() {
-	
+    global::imu.reset();              // starts internal calibration
+    while (global::imu.is_calibrating()) {
+        pros::delay(20);
+    }
+
 }
 
 /**
@@ -42,6 +46,7 @@ void competition_initialize() {}
  */
 void autonomous() {}
 
+using namespace global;
 /**
  * Runs the operator control code. This function will be started in its own task
  * with the default priority and stack size whenever the robot is enabled via
@@ -55,6 +60,29 @@ void autonomous() {}
  * operator control task will be stopped. Re-enabling the robot will restart the
  * task, not resume it from where it left off.
  */
+
+long long int counter = 0;
+
 void opcontrol() {
-	
+    global::con.clear();
+    global::odom.reset();
+
+
+    while (true) {
+        // Update odometry
+        // con.print(0, 0, "IMU: %.2f", imu.get_heading());
+        // pros::delay(100);
+        global::odom.update();
+
+    if (counter % 50 == 0 && counter % 100 != 0 && counter % 150 != 0) {
+        con.print(0, 0, "X: %.2f | Y: %.2f", odom.current_pos.x, odom.current_pos.y);
+    }
+    else if (counter % 50 != 0 && counter % 100 != 0 && counter % 150 == 0) {
+        con.print(0, 0, "I: %.2f", odom.current_pos.theta);
+    }
+    
+
+    counter += 1;
+    pros::delay(5);
+    }
 }

@@ -1,6 +1,20 @@
 #pragma once
 #include "main.h"
 #include <chrono>
+#include <vector>
+#include <cmath>
+#include <type_traits>
+
+
+namespace lynx {
+    class drive;
+    class odometry;
+}
+
+namespace global {
+    extern lynx::drive chassis;
+    extern lynx::odometry odom;
+}
 
 namespace lynx {
     namespace util {
@@ -100,10 +114,10 @@ namespace lynx {
         }
 
         double pods_to_inches(double ticks, std::string wheel_type) { 
-            if (wheel_type == "odom"){
+            if (wheel_type == "odom") {
                 return (ticks / 36000.0) * (M_PI * global::odom.odom_wheel_diameter); 
             }
-            else if (wheel_type == "motor"){
+            else if (wheel_type == "motor") {
                 return (ticks / 300.0) * (M_PI * global::chassis.wheel_diameter);
             }
             return 0.0;
