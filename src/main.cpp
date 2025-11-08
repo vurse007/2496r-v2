@@ -44,7 +44,9 @@ void competition_initialize() {}
  * will be stopped. Re-enabling the robot will restart the task, not re-start it
  * from where it left off.
  */
-void autonomous() {}
+void autonomous() {
+    global::chassis.straight(20);
+}
 
 using namespace global;
 /**

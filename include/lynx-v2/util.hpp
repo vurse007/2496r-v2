@@ -5,17 +5,6 @@
 #include <cmath>
 #include <type_traits>
 
-
-namespace lynx {
-    class drive;
-    class odometry;
-}
-
-namespace global {
-    extern lynx::drive chassis;
-    extern lynx::odometry odom;
-}
-
 namespace lynx {
     namespace util {
 
@@ -89,39 +78,9 @@ namespace lynx {
             return angle - M_PI;
         }
 
-        float reduce_0_to_360(float angle){
-            while(!(angle >= 0 && angle < 360)){
-                if (angle<0) angle += 360;
-                if (angle>=360) angle -= 360;
-            }
-            return angle;
-        }
-
-        float reduce_neg_180_to_180(float angle){
-            while (!(angle >= -180 && angle < 180)){
-                if (angle < -180) angle += 360;
-                if (angle >= 180) angle -= 360;
-            }
-            return angle;
-        }
-
-        float reduce_neg_90_to_90(float angle){
-            while(!(angle >= -90 && angle < 90)){
-                if (angle < -90) angle += 180;
-                if (angle >= 90) angle -= 180;
-            }
-            return angle;
-        }
-
-        double pods_to_inches(double ticks, std::string wheel_type) { 
-            if (wheel_type == "odom") {
-                return (ticks / 36000.0) * (M_PI * global::odom.odom_wheel_diameter); 
-            }
-            else if (wheel_type == "motor") {
-                return (ticks / 300.0) * (M_PI * global::chassis.wheel_diameter);
-            }
-            return 0.0;
-        }
+        // Forward declaration - implementation needs full type definitions
+        // This function should be defined in a file that includes chassis.hpp and odom.hpp
+        double pods_to_inches(double ticks, std::string wheel_type);
 
         float to_rad(float angle){
             return (angle/(180/M_PI));

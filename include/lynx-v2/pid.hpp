@@ -1,8 +1,10 @@
 #pragma once
 #include <cmath>
 #include "util.hpp"
-#include "config.hpp"
 #include <algorithm>
+// Note: config.hpp is not included here to avoid circular dependency
+// Functions that need global::chassis, global::odom, etc. should be implemented
+// in config.hpp or in files that include config.hpp after all types are defined
 
 namespace lynx {
 
@@ -42,13 +44,12 @@ namespace lynx {
         double integral_threshold;
         double max_integral;
         double deadband;
-        double count_range;
         double settle_timer_target;
 
         util::timer settle_timer;
 
-        inline PID(constants g, constants r, double rr, double slew, double it, double mi, double db, double cr, double st):
-            general_constants(g), refined_constants(r), refined_range(rr), slew(slew),integral_threshold(it), max_integral(mi), deadband(db), count_range(cr), settle_timer_target(st) {}
+        inline PID(constants g, constants r, double rr, double slew, double it, double mi, double db, double st):
+            general_constants(g), refined_constants(r), refined_range(rr), slew(slew),integral_threshold(it), max_integral(mi), deadband(db), settle_timer_target(st) {}
 
         inline double calculate(double target, double current, double scale=1.0){
             tgt = target;
@@ -68,6 +69,7 @@ namespace lynx {
 
             //calculate speed
             if (std::fabs(error) < refined_range){
+                settle_timer.start();
                 speed = scale * (refined_constants.kP * error + refined_constants.kI * total_error + refined_constants.kD * derivative);
             }
             else {
@@ -94,21 +96,5 @@ namespace lynx {
             return speed;
         }
 
-        inline void straight(double target, int timeout = 2000, double scale=1.0){
-            settle_timer.restart();
-            util::timer safety_timer(timeout);
-            double init_pos = global::chassis.get_position();
-            double curr_pos;
-            while (true){
-                if (global::chassis.distance_pod != nullptr){ //if it is using the rotation sensor
-                    curr_pos = util::pods_to_inches((global::chassis.get_position() - init_pos), "odom");
-                }
-                else { //using chassis enocoders
-                    curr_pos = util::pods_to_inches((global::chassis.get_position() - init_pos), "motor");
-                }
-
-                //double drive_speed = calculate
-            }
-        }
     };
 }

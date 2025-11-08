@@ -1,5 +1,6 @@
 #pragma once
 #include "main.h"
+#include "pid.hpp"
 
 namespace lynx {
     struct motor_specs {
@@ -84,7 +85,29 @@ namespace lynx {
             const double track_width;
 
             pros::Imu* imu;
-            pros::Rotation* distance_pod;
+            pros::Rotation* distance_pod;        
+
+            PID heading_correction_pid{
+                {0,0,0},
+                {0,0,0},
+                0,
+                127,
+                0,
+                1000,
+                0,
+                0
+            };
+
+            PID drive_pid{
+                {1,0,0},
+                {0,0,0},
+                5,
+                127,
+                0,
+                1000,
+                0,
+                300
+            };
 
             drive(const std::vector<motor_specs>& ls, const std::vector<motor_specs>& rs, const double wd, const double egr, const double tw, pros::Imu* imu, pros::Rotation* distance_pod):
                 left(ls), right(rs), wheel_diameter(wd), external_gear_ratio(egr), track_width(tw), imu(imu), distance_pod(distance_pod) {}
@@ -134,6 +157,10 @@ namespace lynx {
             // my_chassis.apply_to_group(my_chassis.left, [](std::shared_ptr<pros::Motor> motor){ motor->set_voltage_limit(12000); });
             //get rid of my_chassis.left to apply to whole chassis
             //second parameter is a lambda function, needs to have a motor pointer as parameter, to use when applying the function
+
+            // Note: straight() implementation moved to config.hpp to avoid circular dependency
+            // This is a forward declaration - implementation is provided in config.hpp
+            void straight(double target, int timeout = 2000, double scale=1.0);
 
     };
 
