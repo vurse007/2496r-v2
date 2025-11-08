@@ -99,14 +99,14 @@ namespace lynx {
             };
 
             PID drive_pid{
-                {1,0,0},
-                {0,0,0},
-                5,
-                127,
-                0,
-                1000,
-                0,
-                300
+                {3, 0.005, 1},      // general_constants: kp, ki, kd
+                {3, 0.005, 1},      // refined_constants
+                1.4,                // refined_range
+                0.35,               // slew
+                30,                 // integral_threshold
+                200,                // max_integral
+                0,                  // deadband
+                40                  // settle_timer_target (8 checks * 5ms)
             };
 
             drive(const std::vector<motor_specs>& ls, const std::vector<motor_specs>& rs, const double wd, const double egr, const double tw, pros::Imu* imu, pros::Rotation* distance_pod):

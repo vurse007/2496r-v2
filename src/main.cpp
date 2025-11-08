@@ -45,6 +45,7 @@ void competition_initialize() {}
  * from where it left off.
  */
 void autonomous() {
+    global::chassis.tare();
     global::chassis.straight(20);
 }
 
