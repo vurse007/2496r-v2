@@ -87,7 +87,7 @@ namespace lynx {
             pros::Imu* imu;
             pros::Rotation* distance_pod;        
 
-            PID turn_pid{
+            PID heading_correction_pid{
                 {0,0,0},
                 {0,0,0},
                 0,
@@ -158,9 +158,9 @@ namespace lynx {
             //get rid of my_chassis.left to apply to whole chassis
             //second parameter is a lambda function, needs to have a motor pointer as parameter, to use when applying the function
 
+            // Note: straight() implementation moved to config.hpp to avoid circular dependency
+            // This is a forward declaration - implementation is provided in motion.hpp
             void straight(double target, int timeout = 2000, double scale=1.0);
-            void turn_rel(double target, int timeout = 1000, double scale=1.0);
-            void turn_abs(double target, int timeout = 1000, double scale=1.0);
 
     };
 

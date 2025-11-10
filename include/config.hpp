@@ -5,12 +5,11 @@
 
 namespace global {
 
-    inline pros::Rotation horizontal_pod(10);
-    inline pros::Rotation vertical_pod(16);
-    inline pros::Imu imu(7);
-    inline pros::adi::DigitalOut matchLoaderP('A', true);
+    pros::Rotation horizontal_pod(10);
+    pros::Rotation vertical_pod(16);
+    pros::Imu imu(7);
 
-    inline pros::Controller con(pros::E_CONTROLLER_MASTER);
+    pros::Controller con(pros::E_CONTROLLER_MASTER);
 
     inline lynx::drive chassis {
         {{-11, pros::v5::MotorGears::blue}, {12, pros::v5::MotorGears::blue}, {-13, pros::v5::MotorGears::blue}},//left motors
