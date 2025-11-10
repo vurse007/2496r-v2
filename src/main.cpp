@@ -8,7 +8,7 @@
  * to keep execution time for this mode under a few seconds.
  */
 void initialize() {
-    global::imu.reset();              // starts internal calibration
+    global::imu.reset();
     while (global::imu.is_calibrating()) {
         pros::delay(20);
     }
@@ -65,11 +65,12 @@ using namespace global;
  */
 
 long long int counter = 0;
+lynx::util::timer driver_time;
 
 void opcontrol() {
     global::con.clear();
     global::odom.reset();
-
+    driver_time.restart();
 
     while (true) {
         // Update odometry
@@ -77,13 +78,19 @@ void opcontrol() {
         // pros::delay(100);
         global::odom.update();
 
-    if (counter % 50 == 0 && counter % 100 != 0 && counter % 150 != 0) {
-        con.print(0, 0, "X: %.2f | Y: %.2f", odom.current_pos.x, odom.current_pos.y);
-    }
-    else if (counter % 50 != 0 && counter % 100 != 0 && counter % 150 == 0) {
-        con.print(0, 0, "I: %.2f", odom.current_pos.theta);
-    }
-    
+        lynx::util::print_info(
+            driver_time.elapsed(), 
+            &global::con, 
+            {"X", "Y", "Imu"}, 
+            {odom.current_pos.x, odom.current_pos.y, odom.current_pos.theta}
+        );
+        
+        // if (counter % 50 == 0 && counter % 100 != 0 && counter % 150 != 0) {
+        //     con.print(0, 0, "X: %.2f | Y: %.2f", odom.current_pos.x, odom.current_pos.y);
+        // }
+        // else if (counter % 50 != 0 && counter % 100 != 0 && counter % 150 == 0) {
+        //     con.print(0, 0, "I: %.2f", odom.current_pos.theta);
+        // }
 
     counter += 1;
     pros::delay(5);

@@ -4,6 +4,9 @@
 #include <vector>
 #include <cmath>
 #include <type_traits>
+#include <string>
+#include <sstream>
+#include <iomanip> 
 
 namespace lynx {
     namespace util {
@@ -22,7 +25,7 @@ namespace lynx {
                     running = true;
                 }
 
-                u_int32_t elapsed() {
+                u_int32_t elapsed() const{
                     if (!running) return 0;
                     return pros::millis() - start_time;
                 }
@@ -64,7 +67,9 @@ namespace lynx {
                     for (const double& coeff : this->coefficients){
                         y = (y*x) + coeff; //using const to prevent changing of coeffs and & for preventing copy of the vector every time the for loop runs
                     }
+                    
                     return y;
+
                 }
 
                 long double scientific_notation(long double number, double exponent){
@@ -78,20 +83,60 @@ namespace lynx {
             return angle - M_PI;
         }
 
-        float to_rad(float angle){
+        inline double absolute_logic(double init_heading, pros::Imu *inertial){
+            return fmod((init_heading - inertial->get_heading() + 540), 360) - 180;
+        }
+
+        inline double pods_to_inches(double ticks, double wheel_diameter, const std::string& wheel_type) {
+            double ticks_per_rev = (wheel_type == "odom") ? 36000.0 : (wheel_type == "motor") ? 300.0 : 300.0;
+            return (ticks / ticks_per_rev) * (M_PI * wheel_diameter);
+        }
+
+        inline void print_info(int time, pros::Controller* controller, const std::vector<std::string>& labels, const std::vector<double>& values) {
+            if (!controller || labels.empty() || labels.size() != values.size()) return;
+
+            const int pairs_per_line = std::ceil(labels.size() / 3.0);
+
+            auto build_line = [&](int start, int end) -> std::string {
+                std::ostringstream oss;
+                oss << std::fixed << std::setprecision(2); // two decimal places
+                for (int i = start; i < end && i < (int)labels.size(); ++i) {
+                    oss << labels[i] << ": " << values[i];
+                    if (i < end - 1 && i < (int)labels.size() - 1) oss << " | ";
+                }
+                return oss.str();
+            };
+
+            if (time % 50 == 0 && time % 100 != 0 && time % 150 != 0) {
+                std::string line0 = build_line(0, pairs_per_line);
+                controller->print(0, 0, "%s   ", line0.c_str());
+            }
+
+            if (time % 100 == 0 && time % 150 != 0) {
+                std::string line1 = build_line(pairs_per_line, pairs_per_line * 2);
+                controller->print(1, 0, "%s   ", line1.c_str());
+            }
+
+            if (time % 150 == 0 && time % 300 != 0) {
+                std::string line2 = build_line(pairs_per_line * 2, pairs_per_line * 3);
+                controller->print(2, 0, "%s   ", line2.c_str());
+            }
+        }
+
+        inline float to_rad(float angle){
             return (angle/(180/M_PI));
         }
 
-        float to_deg(float angle){
+        inline float to_deg(float angle){
             return(angle*(180/M_PI));
         }
 
-        float deadband(float input, float range){
+        inline float deadband(float input, float range){
             if (std::fabs(input) < range) return 0;
             return input;
         }
 
-        bool is_line_settled(float desired_x, float desired_y, float desired_angle_deg, float current_x, float current_y){
+        inline bool is_line_settled(float desired_x, float desired_y, float desired_angle_deg, float current_x, float current_y){
             return( (desired_y-current_y) * cos(to_rad(desired_angle_deg)) <= -(desired_x-current_x) * sin(to_rad(desired_angle_deg)) );
         }
 
@@ -116,9 +161,8 @@ namespace lynx {
             return (static_cast<std::underlying_type_t<flags>>(flag) & static_cast<std::underlying_type_t<flags>>(flags_to_check)) != 0;
         }
 
-        timer drive_timer; //both are initialized with default values of target=0 - update later based on the user's needs
-        timer turn_timer;
-        timer arc_timer;
-
+        inline timer drive_timer; //both are initialized with default values of target=0 - update later based on the user's needs
+        inline timer turn_timer;
+        inline timer arc_timer;
     }
 }

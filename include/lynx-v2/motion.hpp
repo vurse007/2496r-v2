@@ -3,58 +3,76 @@
 #include "odom.hpp"
 #include "util.hpp"
 
-// This file is included at the end of config.hpp after all global objects are defined
-// It contains motion implementations that depend on global::chassis and global::odom
-
-namespace lynx {
-    namespace util {
-        inline double pods_to_inches(double ticks, std::string wheel_type) { 
-            if (wheel_type == "odom") {
-                return (ticks / 36000.0) * (M_PI * global::odom.odom_wheel_diameter); 
-            }
-            else if (wheel_type == "motor") {
-                return (ticks / 300.0) * (M_PI * global::chassis.wheel_diameter);
-            }
-            return 0.0;
-        }
-    }
-}
-
-// Implement drive::straight() here after global::chassis is fully defined
 inline void lynx::drive::straight(double target, int timeout, double scale) {
     drive_pid.settle_timer.restart();
+    global::con.clear();
+
     util::timer safety_timer(timeout);
     safety_timer.start();
+    
     double init_pos = global::chassis.get_position();
     double curr_pos;
     double init_heading = global::chassis.imu->get_heading();
-    int loop_count = 0;
-    global::con.clear();
+
     while (true){
-        if (global::chassis.distance_pod != nullptr){ //if it is using the rotation sensor
-            curr_pos = util::pods_to_inches((global::chassis.get_position() - init_pos), "odom");
-        }
-        else { //using chassis encoders
-            curr_pos = util::pods_to_inches((global::chassis.get_position() - init_pos), "motor");
-        }
+        curr_pos = util::pods_to_inches(
+            global::chassis.get_position() - init_pos,
+            global::chassis.distance_pod != nullptr ? global::odom.odom_wheel_diameter : global::chassis.wheel_diameter,
+            global::chassis.distance_pod != nullptr ? "odom" : "motor"
+        );
 
         double drive_speed = drive_pid.calculate(target, curr_pos, scale);
-        double heading_error = fmod((init_heading - global::chassis.imu->get_heading() + 540), 360) - 180;
-        double heading_correction = heading_correction_pid.calculate(heading_error, 0);
+        double heading_error = util::absolute_logic(init_heading, &global::imu);
+        double heading_correction = turn_pid.calculate(heading_error, 0);
         
         int left_motor = (int)(drive_speed + heading_correction);
         int right_motor = (int)(drive_speed - heading_correction);
-    
-        global::con.print(0, 0, "Init pos: %.2f", init_pos);
-        global::con.print(1, 0, "L: %d, R: %d", left_motor, right_motor);
-        global::con.print(2, 0, "Error: %.2f", target - curr_pos);
+        global::chassis.move(left_motor, right_motor);
         
-        global::chassis.move(left_motor, right_motor); // left, right
+        lynx::util::print_info(
+            safety_timer.elapsed(), 
+            &global::con, 
+            {"Init", "L", "R", "Err"}, 
+            {init_pos, (double)left_motor, (double)right_motor, target - curr_pos}
+        );
 
         if (drive_pid.settle_timer.has_elapsed(drive_pid.settle_timer_target)) break;
         if (safety_timer.has_elapsed()) break;
-        loop_count++;
         pros::delay(5);
     }
     global::chassis.move(0,0);
+}
+
+inline void lynx::drive::turn_abs(double target, int timeout, double scale) {
+    turn_pid.settle_timer.restart();
+    global::con.clear();
+
+    util::timer safety_timer(timeout);
+    safety_timer.start();
+    double heading_error;
+
+    while (true){
+        heading_error = util::absolute_logic(target, &global::imu);
+        double turn_speed = turn_pid.calculate(0, heading_error, scale);
+        
+        int left_motor = (int)(turn_speed);
+        int right_motor = (int)(-turn_speed);
+        global::chassis.move(left_motor, right_motor);
+        
+        lynx::util::print_info(
+            safety_timer.elapsed(), 
+            &global::con, 
+            {"Err", "L", "R"}, 
+            {heading_error, (double)left_motor, (double)right_motor}
+        );
+
+        if (turn_pid.settle_timer.has_elapsed(turn_pid.settle_timer_target)) break;
+        if (safety_timer.has_elapsed()) break;
+        pros::delay(5);
+    }
+    global::chassis.move(0,0);
+}
+
+inline void lynx::drive::turn_rel(double delta_deg, int timeout, double scale) {
+    turn_abs(fmod(global::imu.get_heading() + delta_deg + 360, 360), timeout, scale);
 }
