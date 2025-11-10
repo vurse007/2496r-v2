@@ -1,3 +1,4 @@
+#pragma once
 #include "main.h" 
 
 #include <optional> // Forward declaration of wrap_to_pi 

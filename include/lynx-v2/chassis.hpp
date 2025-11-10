@@ -159,7 +159,7 @@ namespace lynx {
             //second parameter is a lambda function, needs to have a motor pointer as parameter, to use when applying the function
 
             // Note: straight() implementation moved to config.hpp to avoid circular dependency
-            // This is a forward declaration - implementation is provided in config.hpp
+            // This is a forward declaration - implementation is provided in motion.hpp
             void straight(double target, int timeout = 2000, double scale=1.0);
 
     };

@@ -78,10 +78,6 @@ namespace lynx {
             return angle - M_PI;
         }
 
-        // Forward declaration - implementation needs full type definitions
-        // This function should be defined in a file that includes chassis.hpp and odom.hpp
-        double pods_to_inches(double ticks, std::string wheel_type);
-
         float to_rad(float angle){
             return (angle/(180/M_PI));
         }
