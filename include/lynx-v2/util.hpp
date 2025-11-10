@@ -92,7 +92,7 @@ namespace lynx {
             return (ticks / ticks_per_rev) * (M_PI * wheel_diameter);
         }
 
-        inline void print_info(int time, pros::Controller* controller, const std::vector<std::string>& labels, const std::vector<double>& values) {
+        inline void print_info(int time, pros::Controller *controller, const std::vector<std::string>& labels, const std::vector<double>& values) {
             if (!controller || labels.empty() || labels.size() != values.size()) return;
 
             const int pairs_per_line = std::ceil(labels.size() / 3.0);
@@ -129,6 +129,15 @@ namespace lynx {
 
         inline float to_deg(float angle){
             return(angle*(180/M_PI));
+        }
+
+        inline double gLeadExp(float distance, float k = 10.0, float lambda = 0.1) {
+            return k * std::exp(-lambda * distance);
+        }
+
+        // Polynomial GLead function
+        inline double gLeadPoly(float distance, float a = 0.1, float b = 0.5, float c = 2.0) {
+            return a * distance*distance + b * distance + c;
         }
 
         inline float deadband(float input, float range){

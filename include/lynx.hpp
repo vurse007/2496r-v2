@@ -6,3 +6,4 @@
 #include "lynx-v2/selector.hpp"
 #include "lynx-v2/queue.hpp"
 #include "lynx-v2/util.hpp"
+#include "lynx-v2/boomerang.hpp"

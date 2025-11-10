@@ -9,7 +9,6 @@ namespace global {
     inline pros::Rotation vertical_pod(16);
     inline pros::Imu imu(7);
     inline pros::adi::DigitalOut matchLoaderP('A', true);
-
     inline pros::Controller con(pros::E_CONTROLLER_MASTER);
 
     inline lynx::drive chassis {

@@ -1,6 +1,10 @@
 #include "main.h"
 #include "lynx.hpp"
 
+extern std::vector<Auton> autons;
+Auton* auton = nullptr;
+std::string names;
+
 /**
  * Runs initialization code. This occurs as soon as the program is started.
  *
@@ -8,11 +12,16 @@
  * to keep execution time for this mode under a few seconds.
  */
 void initialize() {
+    global::odom.reset();
     global::imu.reset();
+    
     while (global::imu.is_calibrating()) {
         pros::delay(20);
     }
 
+    static Auton temp = autons[auton_selector(autons, global::con)];
+    names = temp.get_name1() + " " + temp.get_name2();  // Save display name
+    auton = &temp;     
 }
 
 /**
@@ -45,8 +54,7 @@ void competition_initialize() {}
  * from where it left off.
  */
 void autonomous() {
-    global::chassis.tare();
-    global::chassis.straight(20);
+    if (auton) {(*auton).run();} 
 }
 
 using namespace global;

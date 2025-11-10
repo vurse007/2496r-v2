@@ -8,7 +8,7 @@ inline void lynx::drive::straight(double target, int timeout, double scale) {
     global::con.clear();
 
     util::timer safety_timer(timeout);
-    safety_timer.start();
+    safety_timer.restart();
     
     double init_pos = global::chassis.get_position();
     double curr_pos;
@@ -48,7 +48,7 @@ inline void lynx::drive::turn_abs(double target, int timeout, double scale) {
     global::con.clear();
 
     util::timer safety_timer(timeout);
-    safety_timer.start();
+    safety_timer.restart();
     double heading_error;
 
     while (true){

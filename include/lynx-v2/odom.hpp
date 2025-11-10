@@ -17,14 +17,15 @@ namespace lynx {
         point(double x, double y, double theta = std::numeric_limits<double>::quiet_NaN())
             : x(x), y(y), theta(theta) {}
 
-        double distance_to(const point& other) const {
+        inline double distance_to(const point& other) const {
             double dx = other.x - x, dy = other.y - y;
             return std::sqrt(dx * dx + dy * dy);
         }
 
-        double angle_error(const point& other) const {
+        inline double angle_error(const point& other) const {
             return other.theta - theta;
         }
+
     };
 
     class odometry {
@@ -143,7 +144,26 @@ namespace lynx {
             prev_theta         = current_pos.theta;
         }
 
+        inline point carrotPoint(const point& robot, const point& target, std::optional<std::string> leadType = std::nullopt) {
+            double distance = robot.distance_to(target);
+            double lead;
 
+            std::string type = leadType.value_or("exp");
+
+            if (type == "exp") lead = util::gLeadExp(distance);
+            else if (type == "poly") lead = util::gLeadPoly(distance);
+            else lead = util::gLeadExp(distance);
+
+            double theta = std::isnan(target.theta)
+                ? robot.angle_error(target)
+                : target.theta;
+
+            return point(
+                target.x - lead * std::cos(theta),
+                target.y - lead * std::sin(theta),
+                target.theta
+            );
+        }
 
         // --- Accessors ---
         inline double get_delta_distance() const { return delta_distance; }

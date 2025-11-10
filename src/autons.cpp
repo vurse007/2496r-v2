@@ -1,10 +1,12 @@
 #include "lynx.hpp"
 
 lynx::Queue queue;
+using namespace global;
 
 void solo_awp_right(){
     queue.start();
-    queue.schedule_delay(500, [] {global::matchLoaderP.set_value(true);});
+    // queue.schedule_delay(500, [] {matchLoaderP.set_value(true);});
+    chassis.boomerang(10, 0, 90);
 }
 
 void half_left_red(){
