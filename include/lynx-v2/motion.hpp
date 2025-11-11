@@ -3,6 +3,27 @@
 #include "odom.hpp"
 #include "util.hpp"
 
+namespace lynx::util {
+    template <typename T>
+    inline double get_inches(const T& device) {
+        if constexpr(std::is_same_v<T, pros::Rotation>) {
+            double ticks = device.get_position();
+            return (ticks / 36000.0) * (M_PI * global::odom.odom_wheel_diameter);
+        }
+        else if constexpr (std::is_same_v<T, lynx::drive>) {
+            if (device.distance_pod != nullptr) {
+                return get_inches(*device.distance_pod);
+            } else {
+                return device.get_position();
+            }
+        }
+        else { //else case for anything else - assuming that a individual chassis motor was passed in cus what else would it be
+            double ticks = device.get_position();
+            return (ticks / 300.0) * (M_PI * global::chassis.wheel_diameter);
+        }
+    }
+}
+
 inline void lynx::drive::straight(double target, int timeout, double scale) {
     drive_pid.settle_timer.restart();
     global::con.clear();
@@ -10,17 +31,13 @@ inline void lynx::drive::straight(double target, int timeout, double scale) {
     util::timer safety_timer(timeout);
     safety_timer.restart();
     
-    double init_pos = global::chassis.get_position();
     double curr_pos;
     double init_heading = global::chassis.imu->get_heading();
+    double init_pos = util::get_inches(global::chassis);
 
     while (true){
         global::odom.update();
-        curr_pos = util::pods_to_inches(
-            global::chassis.get_position() - init_pos,
-            global::chassis.distance_pod != nullptr ? global::odom.odom_wheel_diameter : global::chassis.wheel_diameter,
-            global::chassis.distance_pod != nullptr ? "odom" : "motor"
-        );
+        curr_pos = util::get_inches(global::chassis) - init_pos;
 
         double drive_speed = drive_pid.calculate(target, curr_pos, scale);
         double heading_error = util::absolute_logic(init_heading, &global::imu);

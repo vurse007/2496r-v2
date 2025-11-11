@@ -6,7 +6,8 @@
 #include <type_traits>
 #include <string>
 #include <sstream>
-#include <iomanip> 
+#include <iomanip>
+#include <algorithm> 
 
 namespace lynx {
     namespace util {
@@ -56,10 +57,12 @@ namespace lynx {
             public:
                 poly(const std::vector<long double>& coeffs){
                     this->coefficients = coeffs;
+                    std::reverse(this->coefficients.begin(), this->coefficients.end()); //reverse the coefficients internally so it works with the horner's method
                 }
 
                 void update_coefficients(const std::vector<long double>& coeffs){
                     this->coefficients = coeffs;
+                    std::reverse(this->coefficients.begin(), this->coefficients.end());
                 }
 
                 long double evaluate(long double x) const{
@@ -85,11 +88,6 @@ namespace lynx {
 
         inline double absolute_logic(double init_heading, pros::Imu *inertial){
             return fmod((init_heading - inertial->get_heading() + 540), 360) - 180;
-        }
-
-        inline double pods_to_inches(double ticks, double wheel_diameter, const std::string& wheel_type) {
-            double ticks_per_rev = (wheel_type == "odom") ? 36000.0 : (wheel_type == "motor") ? 300.0 : 300.0;
-            return (ticks / ticks_per_rev) * (M_PI * wheel_diameter);
         }
 
         inline void print_info(int time, pros::Controller *controller, const std::vector<std::string>& labels, const std::vector<double>& values) {
@@ -132,12 +130,13 @@ namespace lynx {
         }
 
         inline double gLeadExp(float distance, float k = 10.0, float lambda = 0.1) {
-            return k * std::exp(-lambda * distance);
+            return k * (1 - std::exp(-lambda * distance));
         }
 
         // Polynomial GLead function
-        inline double gLeadPoly(float distance, float a = 0.1, float b = 0.5, float c = 2.0) {
-            return a * distance*distance + b * distance + c;
+        inline double gLeadPoly(float distance, const std::vector<long double>& coeffs = {0.1, 0.5, 2.0}) { //coefficients in normal order (highest degree first)
+            poly p(coeffs);
+            return p.evaluate(distance);
         }
 
         inline float deadband(float input, float range){

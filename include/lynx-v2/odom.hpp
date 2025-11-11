@@ -155,13 +155,11 @@ namespace lynx {
             else                     lead = util::gLeadExp(distance);
 
             // theta is in DEGREES in your point model; convert for trig
-            double theta_deg = std::isnan(target.theta)
-                            ? (target.theta - robot.theta)   // (angle_error)
-                            : target.theta;
+            double theta_deg = target.theta;
             double theta_rad = util::to_rad(theta_deg);          // convert!
 
-            return point(target.x - lead * std::cos(theta_rad),
-                        target.y - lead * std::sin(theta_rad),
+            return point(target.x + lead * std::cos(theta_rad),
+                        target.y + lead * std::sin(theta_rad),
                         target.theta);
         }
 
