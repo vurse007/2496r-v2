@@ -15,6 +15,7 @@ inline void lynx::drive::straight(double target, int timeout, double scale) {
     double init_heading = global::chassis.imu->get_heading();
 
     while (true){
+        global::odom.update();
         curr_pos = util::pods_to_inches(
             global::chassis.get_position() - init_pos,
             global::chassis.distance_pod != nullptr ? global::odom.odom_wheel_diameter : global::chassis.wheel_diameter,
@@ -36,7 +37,7 @@ inline void lynx::drive::straight(double target, int timeout, double scale) {
             {init_pos, (double)left_motor, (double)right_motor, target - curr_pos}
         );
 
-        if (drive_pid.settle_timer.has_elapsed(drive_pid.settle_timer_target)) break;
+        // if (drive_pid.settle_timer.has_elapsed(drive_pid.settle_timer_target)) break;
         if (safety_timer.has_elapsed()) break;
         pros::delay(5);
     }
@@ -66,7 +67,7 @@ inline void lynx::drive::turn_abs(double target, int timeout, double scale) {
             {heading_error, (double)left_motor, (double)right_motor}
         );
 
-        if (turn_pid.settle_timer.has_elapsed(turn_pid.settle_timer_target)) break;
+        //if (turn_pid.settle_timer.has_elapsed(turn_pid.settle_timer_target)) break;
         if (safety_timer.has_elapsed()) break;
         pros::delay(5);
     }

@@ -6,7 +6,13 @@ using namespace global;
 void solo_awp_right(){
     queue.start();
     // queue.schedule_delay(500, [] {matchLoaderP.set_value(true);});
-    chassis.boomerang(10, 0, 90);
+    chassis.boomerang(20, 0, 5);
+    // chassis.move(127, 127);
+    // delay(300);
+    // chassis.move(0, 0);
+    // delay(1000);
+    //chassis.turn_abs(90);
+    //chassis.straight(30);
 }
 
 void half_left_red(){

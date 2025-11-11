@@ -149,21 +149,22 @@ namespace lynx {
             double lead;
 
             std::string type = leadType.value_or("exp");
-
-            if (type == "exp") lead = util::gLeadExp(distance);
+            
+            if (type == "exp")       lead = util::gLeadExp(distance);
             else if (type == "poly") lead = util::gLeadPoly(distance);
-            else lead = util::gLeadExp(distance);
+            else                     lead = util::gLeadExp(distance);
 
-            double theta = std::isnan(target.theta)
-                ? robot.angle_error(target)
-                : target.theta;
+            // theta is in DEGREES in your point model; convert for trig
+            double theta_deg = std::isnan(target.theta)
+                            ? (target.theta - robot.theta)   // (angle_error)
+                            : target.theta;
+            double theta_rad = util::to_rad(theta_deg);          // convert!
 
-            return point(
-                target.x - lead * std::cos(theta),
-                target.y - lead * std::sin(theta),
-                target.theta
-            );
+            return point(target.x - lead * std::cos(theta_rad),
+                        target.y - lead * std::sin(theta_rad),
+                        target.theta);
         }
+
 
         // --- Accessors ---
         inline double get_delta_distance() const { return delta_distance; }

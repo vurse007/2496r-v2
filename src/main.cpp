@@ -1,5 +1,6 @@
 #include "main.h"
 #include "lynx.hpp"
+#include "lynx-v2/util.hpp"
 
 extern std::vector<Auton> autons;
 Auton* auton = nullptr;
@@ -84,14 +85,20 @@ void opcontrol() {
         // Update odometry
         // con.print(0, 0, "IMU: %.2f", imu.get_heading());
         // pros::delay(100);
+        
+        
         global::odom.update();
 
         lynx::util::print_info(
             driver_time.elapsed(), 
             &global::con, 
             {"X", "Y", "Imu"}, 
-            {odom.current_pos.x, odom.current_pos.y, odom.current_pos.theta}
+            {odom.current_pos.x, odom.current_pos.y, lynx::util::to_deg(odom.current_pos.theta)}
         );
+
+        if (global::con.get_digital_new_press(E_CONTROLLER_DIGITAL_UP)){
+            (*auton).run();
+        }
         
         // if (counter % 50 == 0 && counter % 100 != 0 && counter % 150 != 0) {
         //     con.print(0, 0, "X: %.2f | Y: %.2f", odom.current_pos.x, odom.current_pos.y);

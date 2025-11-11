@@ -88,8 +88,8 @@ namespace lynx {
             pros::Rotation* distance_pod;        
 
             PID turn_pid{
-                {0,0,0},
-                {0,0,0},
+                {1,1,1},
+                {0.5,1,1},
                 0,
                 127,
                 0,
