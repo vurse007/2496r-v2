@@ -34,8 +34,8 @@ inline void lynx::drive::boomerang(double targetx, double targety, double target
             {"Err", "ANG", "TURN", "LIN", "CARX", "CARY"}, 
             {linErr, angErr, turnPower, linPower, carrot.x, carrot.y}
         );
-        //if (drive_pid.settle_timer.has_elapsed(drive_pid.settle_timer_target) && turn_pid.settle_timer.has_elapsed(turn_pid.settle_timer_target)) break;
-        //if (safety_timer.has_elapsed()) break;
+        if (drive_pid.settle_timer.has_elapsed(drive_pid.settle_timer_target) && turn_pid.settle_timer.has_elapsed(turn_pid.settle_timer_target)) break;
+        if (safety_timer.has_elapsed()) break;
         pros::delay(5);
     }
     global::chassis.move(0,0);

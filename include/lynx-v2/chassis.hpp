@@ -49,7 +49,7 @@ namespace lynx {
                 }
             }
 
-            double get_avg_pos() {
+            double get_avg_pos() const {
                 double total_pos = 0.0;
                 int count = 0;
                 for (auto& motor : motors) {
@@ -128,7 +128,7 @@ namespace lynx {
                 right.tare();
             }
 
-            double get_position(){
+            double get_position() const{
                 if (distance_pod == nullptr){
                     return (left.get_avg_pos() + right.get_avg_pos()) / 2.0;
                 } else {

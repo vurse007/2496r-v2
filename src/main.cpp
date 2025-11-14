@@ -84,9 +84,7 @@ void opcontrol() {
     while (true) {
         // Update odometry
         // con.print(0, 0, "IMU: %.2f", imu.get_heading());
-        // pros::delay(100);
-        
-        
+        // pros::delay(100);        
         global::odom.update();
 
         lynx::util::print_info(
