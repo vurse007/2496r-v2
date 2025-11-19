@@ -6,7 +6,7 @@ using namespace global;
 void solo_awp_right(){
     queue.start();
     // queue.schedule_delay(500, [] {matchLoaderP.set_value(true);});
-    chassis.boomerang(20, 0, 90);
+    chassis.boomerang(20, 1, 90);
     // chassis.move(127, 127);
     // delay(300);
     // chassis.move(0, 0);

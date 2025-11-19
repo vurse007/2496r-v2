@@ -25,7 +25,7 @@ namespace lynx::util {
 }
 
 inline void lynx::drive::straight(double target, int timeout, double scale) {
-    drive_pid.settle_timer.restart();
+    drive_pid.settle_timer.reset();
     global::con.clear();
 
     util::timer safety_timer(timeout);
@@ -54,7 +54,11 @@ inline void lynx::drive::straight(double target, int timeout, double scale) {
             {init_pos, (double)left_motor, (double)right_motor, target - curr_pos}
         );
 
-        // if (drive_pid.settle_timer.has_elapsed(drive_pid.settle_timer_target)) break;
+        if (abs(target - curr_pos) <= drive_pid.refined_range){
+            drive_pid.settle_timer.start();
+        }
+
+        if (drive_pid.settle_timer.has_elapsed(drive_pid.settle_timer_target)) break;
         if (safety_timer.has_elapsed()) break;
         pros::delay(5);
     }

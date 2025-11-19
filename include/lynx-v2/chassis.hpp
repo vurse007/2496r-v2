@@ -99,7 +99,7 @@ namespace lynx {
             };
 
             PID drive_pid{
-                {3, 0.005, 1},      // general_constants: kp, ki, kd
+                {10, 0.005, 1},      // general_constants: kp, ki, kd
                 {3, 0.005, 1},      // refined_constants
                 1.4,                // refined_range
                 0.35,               // slew

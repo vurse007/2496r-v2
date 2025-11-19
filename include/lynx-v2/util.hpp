@@ -86,6 +86,12 @@ namespace lynx {
             return angle - M_PI;
         }
 
+        inline double wrap_to_deg(double angle) {
+            angle = std::fmod(angle + 180, 360);
+            if (angle < 0) angle += 360;
+            return angle - 180;
+        }
+
         inline double absolute_logic(double init_heading, pros::Imu *inertial){
             return fmod((init_heading - inertial->get_heading() + 540), 360) - 180;
         }

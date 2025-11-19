@@ -22,8 +22,18 @@ namespace lynx {
             return std::sqrt(dx * dx + dy * dy);
         }
 
-        inline double angle_error(const point& other) const {
-            return other.theta - theta;
+        // In your point class:
+        inline double angle_to(const point& other) const {
+            double bearing = std::atan2(other.y - y, other.x - x);
+            bearing = util::to_deg(bearing);  // Convert to degrees
+            
+            double error = bearing - theta;
+            
+            // Angle wrap
+            while (error > 180.0)  error -= 360.0;
+            while (error < -180.0) error += 360.0;
+            
+            return error;
         }
 
     };
@@ -144,7 +154,8 @@ namespace lynx {
             prev_theta         = current_pos.theta;
         }
 
-        inline point carrotPoint(const point& robot, const point& target, std::optional<std::string> leadType = std::nullopt) {
+        inline point carrotPoint(const point& robot, const point& target, 
+                         std::optional<std::string> leadType = std::nullopt) {
             double distance = robot.distance_to(target);
             double lead;
 
@@ -154,12 +165,13 @@ namespace lynx {
             else if (type == "poly") lead = util::gLeadPoly(distance);
             else                     lead = util::gLeadExp(distance);
 
-            // theta is in DEGREES in your point model; convert for trig
-            double theta_deg = target.theta;
-            double theta_rad = util::to_rad(theta_deg);          // convert!
+            // Calculate angle FROM ROBOT TO TARGET (not target's heading!)
+            double angle_to_target = std::atan2(target.y - robot.y, 
+                                                target.x - robot.x);
 
-            return point(target.x + lead * std::cos(theta_rad),
-                        target.y + lead * std::sin(theta_rad),
+            // Place carrot BETWEEN robot and target (subtract lead from target)
+            return point(target.x - lead * std::cos(angle_to_target),
+                        target.y - lead * std::sin(angle_to_target),
                         target.theta);
         }
 
