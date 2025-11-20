@@ -326,8 +326,17 @@ public:
             global::odom.update();
             point robot_pos = global::odom.current_pos;
             
-            // Calculate adaptive lookahead
+            // Distance to final target
+            point final_point = Waypoint_to_point(path.back());
+            double dist_to_final = robot_pos.distance_to(final_point);
+            
+            // Calculate adaptive lookahead, but reduce it near the ensd
             double lookahead = getAdaptiveLookahead();
+            
+            // CRITICAL: Reduce lookahead when close to target to prevent overshooting
+            if (dist_to_final < lookahead * 1.5) {
+                lookahead = std::max(params.min_lookahead, dist_to_final * 0.7);
+            }
             
             // Find lookahead point on path
             auto [found, lookahead_point] = findLookaheadPoint(robot_pos, lookahead);
@@ -344,6 +353,12 @@ public:
             // Get target velocity from current segment
             double target_velocity = path[current_segment_idx].velocity;
             
+            // CRITICAL: Slow down near the target
+            if (dist_to_final < 12.0) {
+                double slowdown_factor = std::max(0.2, dist_to_final / 12.0);
+                target_velocity *= slowdown_factor;
+            }
+            
             // Calculate base velocities from pure pursuit
             double v = target_velocity;
             double omega_pursuit = curvature * v;
@@ -351,8 +366,18 @@ public:
             // Add heading correction
             double omega_heading = calculateHeadingCorrection(robot_pos);
             
-            // Combine angular velocities
-            double omega_total = omega_pursuit + omega_heading;
+            // CRITICAL: Near target, prioritize heading over pursuit
+            double omega_total;
+            if (dist_to_final < 4.0) {
+                // Very close - just fix heading, minimal pursuit influence
+                omega_total = omega_heading * 2.0 + omega_pursuit * 0.2;
+            } else if (dist_to_final < 8.0) {
+                // Getting close - blend more heavily toward heading
+                omega_total = omega_heading * 1.5 + omega_pursuit * 0.5;
+            } else {
+                // Normal operation
+                omega_total = omega_pursuit + omega_heading;
+            }
             
             // Convert to wheel velocities (differential drive kinematics)
             double v_left = v - (omega_total * global::chassis.track_width / 2.0);
@@ -389,7 +414,7 @@ public:
             pros::delay(5);
         }
         
-        // Stop motors
+        // Stop motors and apply brake
         global::chassis.move(0, 0);
     }
 };
@@ -398,9 +423,7 @@ public:
 // CHASSIS INTEGRATION - Add pure pursuit to the drive class
 // ============================================================================
 
-inline void drive::purePursuit(const std::vector<Waypoint>& path, 
-                               const PursuitParams& params,
-                               int timeout) {
+inline void drive::purePursuit(const std::vector<Waypoint>& path, int timeout, const PursuitParams& params) {
     PurePursuitController controller(path, params);
     controller.execute(timeout);
 }

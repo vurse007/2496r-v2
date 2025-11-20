@@ -31,19 +31,19 @@ struct Waypoint {
 // ============================================================================
 struct PursuitParams {
     // Lookahead parameters
-    double base_lookahead = 12.0;        // Base lookahead distance (inches)
-    double min_lookahead = 6.0;          // Minimum lookahead (sharp turns)
-    double max_lookahead = 20.0;         // Maximum lookahead (straight paths)
-    double curvature_scale = 0.8;        // How much curvature affects lookahead
+    double base_lookahead = 14.5;        // Base lookahead distance (inches)
+    double min_lookahead = 4.5;          // Minimum lookahead (sharp turns)
+    double max_lookahead = 17.0;         // Maximum lookahead (straight paths)
+    double curvature_scale = 0.4;        // How much curvature affects lookahead
     
     // Heading control parameters
-    double heading_kp = 1.5;             // Heading correction gain
-    double heading_blend_dist = 10.0;    // Distance to start blending heading
-    double heading_blend_power = 2.0;    // Exponential blend curve (higher = later blend)
+    double heading_kp = 2.2;             // Heading correction gain
+    double heading_blend_dist = 8.0;     // Distance to start blending heading
+    double heading_blend_power = 4.1;    // Exponential blend curve (higher = later blend)
     
     // Path following parameters
-    double path_completion_dist = 2.0;   // Distance to consider path complete (inches)
-    double final_heading_tolerance = 3.0; // Final heading tolerance (degrees)
+    double path_completion_dist = 3.0;   // Distance to consider path complete (inches)
+    double final_heading_tolerance = 5.0; // Final heading tolerance (degrees)
     
     // Settling parameters
     int settle_count_target = 8;         // Number of cycles to be settled (8 * 5ms = 40ms)

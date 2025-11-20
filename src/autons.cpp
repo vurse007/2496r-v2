@@ -6,10 +6,19 @@ using namespace global;
 
 void solo_awp_right(){
     queue.start();
+
+    std::vector<lynx::Waypoint> path1 = {
+        lynx::Waypoint(0, 0, 0, 100),      // Start
+        lynx::Waypoint(0, 24, 0, 100),     // Go straight
+        lynx::Waypoint(24, 24, 90, 100)    // Turn right and settle
+    };
+
+    chassis.purePursuit(path1);
+    
     // queue.schedule_delay(500, [] {matchLoaderP.set_value(true);});
     //chassis.boomerang(20, 20, 90, 0.1);
 
-    chassis.ramsete(20, 20, 90, 2.0, 0.5, 2.0, 0.7, 2000, 1.0);
+    // chassis.ramsete(20, 20, 90, 2.0, 0.5, 2.0, 0.7, 2000, 1.0);
     // chassis.move(127, 127);
     // delay(300);
     // chassis.move(0, 0);
