@@ -161,7 +161,8 @@ namespace lynx {
             void straight(double target, int timeout = 2000, double scale=1.0);
             void turn_rel(double target, int timeout = 1000, double scale=1.0);
             void turn_abs(double target, int timeout = 1000, double scale=1.0);
-            void boomerang(double targetx, double targety, double target_theta, std::string glead = "exp", int timeout = 2000, double scale=1.0);
+            void boomerang(double targetx, double targety, double target_theta, double dLead = 0.5, int timeout = 2000, double scale=1.0);
+            void ramsete(double targetx, double targety, double target_theta, double v_ref, double omega_ref, double b = 2.0, double zeta = 0.7, int timeout = 2000, double scale = 1.0);
 
     };
 

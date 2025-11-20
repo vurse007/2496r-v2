@@ -154,25 +154,19 @@ namespace lynx {
             prev_theta         = current_pos.theta;
         }
 
-        inline point carrotPoint(const point& robot, const point& target, 
-                         std::optional<std::string> leadType = std::nullopt) {
+        inline point carrotPoint(const point& robot, const point& target, double dLead) {
             double distance = robot.distance_to(target);
-            double lead;
-
-            std::string type = leadType.value_or("exp");
             
-            if (type == "exp")       lead = util::gLeadExp(distance);
-            else if (type == "poly") lead = util::gLeadPoly(distance);
-            else                     lead = util::gLeadExp(distance);
-
-            // Calculate angle FROM ROBOT TO TARGET (not target's heading!)
-            double angle_to_target = std::atan2(target.y - robot.y, 
-                                                target.x - robot.x);
-
-            // Place carrot BETWEEN robot and target (subtract lead from target)
-            return point(target.x - lead * std::cos(angle_to_target),
-                        target.y - lead * std::sin(angle_to_target),
-                        target.theta);
+            // Use target's heading angle (in radians) for offset direction
+            double targetThetaRad = util::to_rad(target.theta);
+            
+            // Offset from target in opposite direction of target angle
+            // Offset distance scales with distance to target
+            return point(
+                target.x - distance * std::cos(targetThetaRad) * dLead,
+                target.y - distance * std::sin(targetThetaRad) * dLead,
+                target.theta
+            );
         }
 
 

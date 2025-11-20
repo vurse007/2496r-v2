@@ -5,7 +5,7 @@
 namespace global { extern lynx::odometry odom; }
 
 inline void lynx::drive::boomerang(double targetx, double targety, double target_theta, 
-                                   std::string glead, int timeout, double scale) {
+                                   double dLead, int timeout, double scale) {
     drive_pid.settle_timer.restart();
     turn_pid.settle_timer.restart();
     util::timer safety_timer(timeout);
@@ -22,29 +22,32 @@ inline void lynx::drive::boomerang(double targetx, double targety, double target
         // Distance to actual target
         double targetDistErr = robot.distance_to(target);
         
-        // Switch to direct targeting when close
-        point carrot(0,0,0);
-        if (targetDistErr < 9.0) {
-            carrot = target;  // Aim directly at target
-        } else {
-            carrot = global::odom.carrotPoint(robot, target, glead);
-        }
+        // Always use carrot point calculation
+        point carrot = global::odom.carrotPoint(robot, target, dLead);
 
         // Linear error - distance to carrot
         double linErr = robot.distance_to(carrot);
         
-        // Angular error - bearing to carrot position
-        double bearing_to_carrot = util::to_deg(std::atan2(carrot.y - robot.y, 
-                                                             carrot.x - robot.x));
-        double angErr = bearing_to_carrot - util::to_deg(global::odom.current_pos.theta);
-        // Angle wrap
-        while (angErr > 180.0)  angErr -= 360.0;
-        while (angErr < -180.0) angErr += 360.0;
-
         // Target angular error for settling check
         double targetAngErr = target_theta - util::to_deg(global::odom.current_pos.theta);
         while (targetAngErr > 180.0)  targetAngErr -= 360.0;
         while (targetAngErr < -180.0) targetAngErr += 360.0;
+        
+        // Simple switching logic - NO BLENDING
+        // When far from target: turn toward carrot to follow the curve
+        // When close to target: turn toward target angle
+        double angErr;
+        if (targetDistErr > 12.0) {
+            // Far from target - turn toward carrot
+            double bearingToCarrot = util::to_deg(std::atan2(carrot.y - robot.y, 
+                                                              carrot.x - robot.x));
+            angErr = bearingToCarrot - util::to_deg(global::odom.current_pos.theta);
+            while (angErr > 180.0)  angErr -= 360.0;
+            while (angErr < -180.0) angErr += 360.0;
+        } else {
+            // Close to target - turn toward target angle
+            angErr = targetAngErr;
+        }
 
         // PID calculations
         double linPower  = drive_pid.calculate(linErr, 0, scale);

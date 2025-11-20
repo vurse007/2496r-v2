@@ -1,0 +1,519 @@
+import React, { useState, useEffect, useRef } from 'react';
+import { Play, Pause, RotateCcw, Settings } from 'lucide-react';
+
+const RamseteTuner = () => {
+  const canvasRef = useRef(null);
+  const animationRef = useRef(null);
+  
+  // Robot state
+  const [robotState, setRobotState] = useState({
+    x: 0,
+    y: 0,
+    theta: 0  // theta = 0 means pointing up/north in VEX
+  });
+  
+  // Target state
+  const [target, setTarget] = useState({ x: 48, y: 48, theta: 90 });
+  
+  // Ramsete parameters
+  const [vRef, setVRef] = useState(20.0);  // inches/s
+  const [omegaRef, setOmegaRef] = useState(0.0);  // rad/s
+  const [b, setB] = useState(2.0);
+  const [zeta, setZeta] = useState(0.7);
+  const [trackWidth, setTrackWidth] = useState(12.0);  // inches
+  const [maxVelocity, setMaxVelocity] = useState(50.0);  // inches/s
+  
+  // Simulation state
+  const [isRunning, setIsRunning] = useState(false);
+  const [trail, setTrail] = useState([]);
+  const [settled, setSettled] = useState(false);
+  const [showSettings, setShowSettings] = useState(true);
+  
+  // Metrics
+  const [metrics, setMetrics] = useState({
+    distanceError: 0,
+    angleError: 0,
+    time: 0,
+    v: 0,
+    omega: 0,
+    eXRobot: 0,
+    eYRobot: 0,
+    leftMotor: 0,
+    rightMotor: 0
+  });
+
+  const wrapToPi = (angle) => {
+    let wrapped = ((angle + Math.PI) % (2 * Math.PI));
+    if (wrapped < 0) wrapped += 2 * Math.PI;
+    return wrapped - Math.PI;
+  };
+
+  const toRad = (deg) => deg * Math.PI / 180;
+  const toDeg = (rad) => rad * 180 / Math.PI;
+
+  const simulateStep = (state, dt = 0.05) => {
+    // Current robot pose (theta already in radians)
+    const x = state.x;
+    const y = state.y;
+    const theta = state.theta;
+    
+    // Reference pose
+    const x_ref = target.x;
+    const y_ref = target.y;
+    const theta_ref = toRad(target.theta);
+    
+    // Calculate pose error in global frame
+    const e_x = x_ref - x;
+    const e_y = y_ref - y;
+    let e_theta = theta_ref - theta;
+    
+    // Wrap angle error to [-pi, pi]
+    e_theta = wrapToPi(e_theta);
+    
+    // Transform error to robot's reference frame
+    const cos_theta = Math.cos(theta);
+    const sin_theta = Math.sin(theta);
+    
+    const e_x_robot = cos_theta * e_x + sin_theta * e_y;
+    const e_y_robot = -sin_theta * e_x + cos_theta * e_y;
+    
+    // Calculate the time-varying gain k
+    const k = 2.0 * zeta * Math.sqrt(omegaRef * omegaRef + b * vRef * vRef);
+    
+    // RAMSETE control law - Linear velocity
+    const v = vRef * Math.cos(e_theta) + k * e_x_robot;
+    
+    // Angular velocity with sinc function
+    let sinc_term;
+    if (Math.abs(e_theta) < 1e-6) {
+      sinc_term = 1.0;
+    } else {
+      sinc_term = Math.sin(e_theta) / e_theta;
+    }
+    
+    const omega = omegaRef + b * vRef * sinc_term * e_y_robot + k * e_theta;
+    
+    // Convert (v, omega) to left/right wheel velocities
+    const v_left = v - (omega * trackWidth / 2.0);
+    const v_right = v + (omega * trackWidth / 2.0);
+    
+    // Convert wheel velocities to motor commands
+    const velocityScale = 127.0 / maxVelocity;
+    
+    let leftMotorCmd = v_left * velocityScale;
+    let rightMotorCmd = v_right * velocityScale;
+    
+    // Clamp to motor range
+    leftMotorCmd = Math.max(-127, Math.min(127, leftMotorCmd));
+    rightMotorCmd = Math.max(-127, Math.min(127, rightMotorCmd));
+    
+    // Update position using actual velocities
+    const actual_v = (v_left + v_right) / 2.0;
+    const actual_omega = (v_left - v_right) / trackWidth;
+    
+    // VEX convention: theta = 0 points up (north), positive theta is CCW
+    // When theta = 0, cos(0) = 1, sin(0) = 0, so we move in +Y (up)
+    // When theta = 90deg = pi/2, cos(pi/2) = 0, sin(pi/2) = 1, so we move in +X (right)
+    const newX = x + actual_v * Math.sin(theta) * dt;
+    const newY = y + actual_v * Math.cos(theta) * dt;
+    const newTheta = wrapToPi(theta + actual_omega * dt);
+    
+    // Calculate errors for display
+    const targetDistErr = Math.sqrt(e_x * e_x + e_y * e_y);
+    const targetAngErr = toDeg(e_theta);
+    
+    setMetrics({
+      distanceError: targetDistErr,
+      angleError: targetAngErr,
+      time: metrics.time + dt,
+      v: v,
+      omega: omega,
+      eXRobot: e_x_robot,
+      eYRobot: e_y_robot,
+      leftMotor: leftMotorCmd,
+      rightMotor: rightMotorCmd
+    });
+    
+    // Check if settled
+    if (targetDistErr < 2 && Math.abs(targetAngErr) < 3) {
+      setSettled(true);
+      setIsRunning(false);
+    }
+    
+    return {
+      x: newX,
+      y: newY,
+      theta: newTheta
+    };
+  };
+
+  useEffect(() => {
+    if (isRunning && !settled) {
+      animationRef.current = setInterval(() => {
+        setRobotState(prev => {
+          const newState = simulateStep(prev);
+          setTrail(t => [...t.slice(-200), { x: newState.x, y: newState.y }]);
+          return newState;
+        });
+      }, 50);
+    } else {
+      if (animationRef.current) clearInterval(animationRef.current);
+    }
+    
+    return () => {
+      if (animationRef.current) clearInterval(animationRef.current);
+    };
+  }, [isRunning, settled, vRef, omegaRef, b, zeta, trackWidth, maxVelocity, target]);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    
+    const ctx = canvas.getContext('2d');
+    const width = canvas.width;
+    const height = canvas.height;
+    const scale = width / 144;
+    
+    // Clear
+    ctx.fillStyle = '#1a1a2e';
+    ctx.fillRect(0, 0, width, height);
+    
+    // Grid
+    ctx.strokeStyle = '#2a2a3e';
+    ctx.lineWidth = 1;
+    for (let i = 0; i <= 144; i += 12) {
+      ctx.beginPath();
+      ctx.moveTo(i * scale, 0);
+      ctx.lineTo(i * scale, height);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(0, i * scale);
+      ctx.lineTo(width, i * scale);
+      ctx.stroke();
+    }
+    
+    // Trail
+    ctx.strokeStyle = '#00ff9f';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    trail.forEach((p, i) => {
+      const x = p.x * scale;
+      const y = height - p.y * scale;
+      if (i === 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+    });
+    ctx.stroke();
+    
+    // Target
+    ctx.save();
+    ctx.translate(target.x * scale, height - target.y * scale);
+    ctx.rotate(-toRad(target.theta));
+    ctx.fillStyle = '#ff3366';
+    ctx.fillRect(-8, -8, 16, 16);
+    ctx.fillStyle = '#fff';
+    ctx.beginPath();
+    ctx.moveTo(10, 0);
+    ctx.lineTo(0, -5);
+    ctx.lineTo(0, 5);
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+    
+    // Robot
+    ctx.save();
+    ctx.translate(robotState.x * scale, height - robotState.y * scale);
+    // VEX: theta = 0 means pointing up (north)
+    // Canvas: 0 rotation means pointing right, so subtract PI/2 to align
+    ctx.rotate(-(robotState.theta - Math.PI / 2));
+    ctx.fillStyle = '#00d4ff';
+    ctx.fillRect(-6, -6, 12, 12);
+    ctx.fillStyle = '#fff';
+    ctx.beginPath();
+    ctx.moveTo(8, 0);
+    ctx.lineTo(0, -4);
+    ctx.lineTo(0, 4);
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+    
+  }, [robotState, trail, target]);
+
+  const reset = () => {
+    setRobotState({ x: 0, y: 0, theta: 0 });
+    setTrail([]);
+    setSettled(false);
+    setMetrics({ distanceError: 0, angleError: 0, time: 0, v: 0, omega: 0, eXRobot: 0, eYRobot: 0, leftMotor: 0, rightMotor: 0 });
+    setIsRunning(false);
+  };
+
+  return (
+    <div className="w-full h-screen bg-gray-900 text-white p-4 flex gap-4">
+      <div className="flex-1 flex flex-col gap-4">
+        <div className="bg-gray-800 rounded-lg p-4">
+          <div className="flex gap-2 mb-4">
+            <button
+              onClick={() => setIsRunning(!isRunning)}
+              className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded"
+            >
+              {isRunning ? <Pause size={20} /> : <Play size={20} />}
+              {isRunning ? 'Pause' : 'Start'}
+            </button>
+            <button
+              onClick={reset}
+              className="flex items-center gap-2 px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded"
+            >
+              <RotateCcw size={20} /> Reset
+            </button>
+            <button
+              onClick={() => setShowSettings(!showSettings)}
+              className="flex items-center gap-2 px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded ml-auto"
+            >
+              <Settings size={20} /> {showSettings ? 'Hide' : 'Show'} Settings
+            </button>
+          </div>
+          
+          <div className="grid grid-cols-5 gap-3 text-sm">
+            <div className="bg-gray-700 p-2 rounded">
+              <div className="text-gray-400 text-xs">Dist Err</div>
+              <div className="text-lg font-mono text-cyan-400">{metrics.distanceError.toFixed(2)}"</div>
+            </div>
+            <div className="bg-gray-700 p-2 rounded">
+              <div className="text-gray-400 text-xs">Ang Err</div>
+              <div className="text-lg font-mono text-cyan-400">{metrics.angleError.toFixed(1)}°</div>
+            </div>
+            <div className="bg-gray-700 p-2 rounded">
+              <div className="text-gray-400 text-xs">Time</div>
+              <div className="text-lg font-mono text-cyan-400">{metrics.time.toFixed(1)}s</div>
+            </div>
+            <div className="bg-gray-700 p-2 rounded">
+              <div className="text-gray-400 text-xs">Robot θ</div>
+              <div className="text-lg font-mono text-cyan-400">{toDeg(robotState.theta).toFixed(1)}°</div>
+            </div>
+            <div className="bg-gray-700 p-2 rounded">
+              <div className="text-gray-400 text-xs">V</div>
+              <div className="text-lg font-mono text-purple-400">{metrics.v.toFixed(1)}</div>
+            </div>
+          </div>
+          <div className="grid grid-cols-6 gap-3 text-sm mt-2">
+            <div className="bg-gray-700 p-2 rounded">
+              <div className="text-gray-400 text-xs">Omega</div>
+              <div className="text-lg font-mono text-green-400">{metrics.omega.toFixed(2)}</div>
+            </div>
+            <div className="bg-gray-700 p-2 rounded">
+              <div className="text-gray-400 text-xs">eX robot</div>
+              <div className="text-lg font-mono text-green-400">{metrics.eXRobot.toFixed(1)}</div>
+            </div>
+            <div className="bg-gray-700 p-2 rounded">
+              <div className="text-gray-400 text-xs">eY robot</div>
+              <div className="text-lg font-mono text-green-400">{metrics.eYRobot.toFixed(1)}</div>
+            </div>
+            <div className="bg-gray-700 p-2 rounded">
+              <div className="text-gray-400 text-xs">L Motor</div>
+              <div className="text-lg font-mono text-orange-400">{metrics.leftMotor.toFixed(0)}</div>
+            </div>
+            <div className="bg-gray-700 p-2 rounded">
+              <div className="text-gray-400 text-xs">R Motor</div>
+              <div className="text-lg font-mono text-orange-400">{metrics.rightMotor.toFixed(0)}</div>
+            </div>
+            <div className="bg-gray-700 p-2 rounded">
+              <div className="text-gray-400 text-xs">Robot Y</div>
+              <div className="text-lg font-mono text-blue-400">{robotState.y.toFixed(1)}</div>
+            </div>
+          </div>
+          
+          {settled && (
+            <div className="mt-4 p-3 bg-green-900/30 border border-green-500 rounded text-green-400">
+              ✓ Settled at target
+            </div>
+          )}
+        </div>
+        
+        <div className="flex-1 bg-gray-800 rounded-lg p-4">
+          <canvas 
+            ref={canvasRef} 
+            width={600} 
+            height={600}
+            className="w-full h-full"
+          />
+        </div>
+      </div>
+      
+      {showSettings && (
+        <div className="w-80 bg-gray-800 rounded-lg p-4 overflow-y-auto space-y-4">
+          <div>
+            <h3 className="font-bold mb-3">Target Position</h3>
+            <div className="space-y-2">
+              <div>
+                <label className="text-sm text-gray-400">X (inches)</label>
+                <input
+                  type="number"
+                  value={target.x}
+                  onChange={(e) => setTarget({...target, x: parseFloat(e.target.value) || 0})}
+                  className="w-full bg-gray-700 rounded px-3 py-2 mt-1"
+                />
+              </div>
+              <div>
+                <label className="text-sm text-gray-400">Y (inches)</label>
+                <input
+                  type="number"
+                  value={target.y}
+                  onChange={(e) => setTarget({...target, y: parseFloat(e.target.value) || 0})}
+                  className="w-full bg-gray-700 rounded px-3 py-2 mt-1"
+                />
+              </div>
+              <div>
+                <label className="text-sm text-gray-400">Angle (degrees)</label>
+                <input
+                  type="number"
+                  value={target.theta}
+                  onChange={(e) => setTarget({...target, theta: parseFloat(e.target.value) || 0})}
+                  className="w-full bg-gray-700 rounded px-3 py-2 mt-1"
+                />
+              </div>
+            </div>
+          </div>
+          
+          <div>
+            <h3 className="font-bold mb-3">Reference Velocities</h3>
+            <div className="space-y-2">
+              <div>
+                <label className="text-sm text-gray-400">v_ref: {vRef.toFixed(1)} in/s</label>
+                <input
+                  type="range"
+                  min="5"
+                  max="50"
+                  step="1"
+                  value={vRef}
+                  onChange={(e) => setVRef(parseFloat(e.target.value))}
+                  className="w-full"
+                />
+                <div className="text-xs text-gray-500 mt-1">
+                  Reference linear velocity
+                </div>
+              </div>
+              <div>
+                <label className="text-sm text-gray-400">omega_ref: {omegaRef.toFixed(2)} rad/s</label>
+                <input
+                  type="range"
+                  min="-2"
+                  max="2"
+                  step="0.1"
+                  value={omegaRef}
+                  onChange={(e) => setOmegaRef(parseFloat(e.target.value))}
+                  className="w-full"
+                />
+                <div className="text-xs text-gray-500 mt-1">
+                  Reference angular velocity
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div>
+            <h3 className="font-bold mb-3">Ramsete Parameters</h3>
+            <div className="space-y-2">
+              <div>
+                <label className="text-sm text-gray-400">b: {b.toFixed(2)}</label>
+                <input
+                  type="range"
+                  min="0.5"
+                  max="5"
+                  step="0.1"
+                  value={b}
+                  onChange={(e) => setB(parseFloat(e.target.value))}
+                  className="w-full"
+                />
+                <div className="text-xs text-gray-500 mt-1">
+                  Convergence parameter (higher = more aggressive)
+                </div>
+              </div>
+              <div>
+                <label className="text-sm text-gray-400">zeta: {zeta.toFixed(2)}</label>
+                <input
+                  type="range"
+                  min="0.1"
+                  max="2"
+                  step="0.1"
+                  value={zeta}
+                  onChange={(e) => setZeta(parseFloat(e.target.value))}
+                  className="w-full"
+                />
+                <div className="text-xs text-gray-500 mt-1">
+                  Damping parameter
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div>
+            <h3 className="font-bold mb-3">Robot Parameters</h3>
+            <div className="space-y-2">
+              <div>
+                <label className="text-sm text-gray-400">Track Width: {trackWidth.toFixed(1)}"</label>
+                <input
+                  type="range"
+                  min="8"
+                  max="20"
+                  step="0.5"
+                  value={trackWidth}
+                  onChange={(e) => setTrackWidth(parseFloat(e.target.value))}
+                  className="w-full"
+                />
+              </div>
+              <div>
+                <label className="text-sm text-gray-400">Max Velocity: {maxVelocity.toFixed(1)} in/s</label>
+                <input
+                  type="range"
+                  min="20"
+                  max="100"
+                  step="5"
+                  value={maxVelocity}
+                  onChange={(e) => setMaxVelocity(parseFloat(e.target.value))}
+                  className="w-full"
+                />
+                <div className="text-xs text-gray-500 mt-1">
+                  Max velocity for motor scaling
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div className="bg-blue-900/30 border border-blue-500 rounded p-3 text-sm">
+            <div className="font-bold text-blue-400 mb-1">RAMSETE Control Law:</div>
+            <div className="text-blue-300 text-xs space-y-1">
+              <div>v = v_ref·cos(e_θ) + k·e_x_robot</div>
+              <div>ω = ω_ref + b·v_ref·sinc(e_θ)·e_y_robot + k·e_θ</div>
+              <div>k = 2·ζ·√(ω_ref² + b·v_ref²)</div>
+            </div>
+          </div>
+          
+          <div className="pt-4 border-t border-gray-700">
+            <h3 className="font-bold mb-2">Quick Presets</h3>
+            <div className="space-y-2">
+              <button
+                onClick={() => setTarget({ x: 48, y: 48, theta: 90 })}
+                className="w-full px-3 py-2 bg-gray-700 hover:bg-gray-600 rounded text-sm"
+              >
+                Center (48, 48, 90°)
+              </button>
+              <button
+                onClick={() => setTarget({ x: 72, y: 72, theta: 180 })}
+                className="w-full px-3 py-2 bg-gray-700 hover:bg-gray-600 rounded text-sm"
+              >
+                Far Corner (72, 72, 180°)
+              </button>
+              <button
+                onClick={() => setTarget({ x: 24, y: 72, theta: 45 })}
+                className="w-full px-3 py-2 bg-gray-700 hover:bg-gray-600 rounded text-sm"
+              >
+                Side Goal (24, 72, 45°)
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default RamseteTuner;
