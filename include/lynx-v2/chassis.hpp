@@ -1,6 +1,8 @@
 #pragma once
 #include "main.h"
 #include "pid.hpp"
+#include "pursuit_types.hpp"
+
 
 namespace lynx {
     struct motor_specs {
@@ -163,7 +165,7 @@ namespace lynx {
             void turn_abs(double target, int timeout = 1000, double scale=1.0);
             void boomerang(double targetx, double targety, double target_theta, double dLead = 0.5, int timeout = 2000, double scale=1.0);
             void ramsete(double targetx, double targety, double target_theta, double v_ref, double omega_ref, double b = 2.0, double zeta = 0.7, int timeout = 2000, double scale = 1.0);
-
+            void purePursuit(const std::vector<Waypoint>& path, const PursuitParams& params = PursuitParams(), int timeout = 5000);
     };
 
 }

@@ -1,5 +1,6 @@
 #include "lynx.hpp"
 
+
 lynx::Queue queue;
 using namespace global;
 

@@ -8,3 +8,4 @@
 #include "lynx-v2/util.hpp"
 #include "lynx-v2/boomerang.hpp"
 #include "lynx-v2/ramsete.hpp"
+#include "lynx-v2/pursuit.hpp"
