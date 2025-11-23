@@ -2,9 +2,6 @@
 #include <cmath>
 #include "util.hpp"
 #include <algorithm>
-// Note: config.hpp is not included here to avoid circular dependency
-// Functions that need global::chassis, global::odom, etc. should be implemented
-// in config.hpp or in files that include config.hpp after all types are defined
 
 namespace lynx {
 
@@ -18,83 +15,117 @@ namespace lynx {
     };
 
     class PID {
-        public:
+    public:
         constants general_constants;
         constants refined_constants;
 
         double refined_range;
 
-        int dt = 5; // in ms
+        int dt = 5; // ms, not strictly used but kept for completeness
 
-        double curr;
-        double tgt;
-        double prev_val;
-        double error = 0;
-        double prev_error = 0;
-        double total_error = 0;
-        double derivative = 0;
+        double curr = 0.0;
+        double tgt  = 0.0;
 
-        double slew;
-        double prev_speed;
+        double error       = 0.0;
+        double prev_error  = 0.0;
+        double total_error = 0.0;
+        double derivative  = 0.0;
 
-        double speed = 0;
+        double slew        = 0.0;
+        double prev_speed  = 0.0;
+        double speed       = 0.0;
 
-        inline static double glb_tgt_heading = 0;
+        inline static double glb_tgt_heading = 0; // if you use this elsewhere
 
-        double integral_threshold;
-        double max_integral;
-        double deadband;
-        double settle_timer_target;
+        double integral_threshold = 0.0;
+        double max_integral       = 0.0;
+        double deadband           = 0.0;
+        double settle_timer_target = 0.0;
 
         util::timer settle_timer;
 
-        inline PID(constants g, constants r, double rr, double slew, double it, double mi, double db, double st):
-            general_constants(g), refined_constants(r), refined_range(rr), slew(slew),integral_threshold(it), max_integral(mi), deadband(db), settle_timer_target(st) {}
+        inline PID(constants g, constants r, double rr, double slew_val,
+                   double it, double mi, double db, double st):
+            general_constants(g),
+            refined_constants(r),
+            refined_range(rr),
+            slew(slew_val),
+            integral_threshold(it),
+            max_integral(mi),
+            deadband(db),
+            settle_timer_target(st) {}
 
-        inline double calculate(double target, double current, double scale=1.0){
-            tgt = target;
+        inline double calculate(double target, double current, double scale = 1.0) {
+            tgt  = target;
             curr = current;
 
-            //proportional
+            // --------------------------------
+            // ERROR TERMS
+            // --------------------------------
             error = tgt - curr;
 
-            //integral
-            if (std::fabs(error) < integral_threshold){
-                total_error += ((error + prev_error) / 2.0);
-                total_error = std::clamp(total_error, -max_integral, max_integral);
+            // Deadband: treat very small error as zero
+            if (std::fabs(error) < deadband) {
+                error = 0.0;
             }
 
-            //derivative
+            // Integral (with threshold & clamping)
+            if (std::fabs(error) < integral_threshold) {
+                total_error += (error + prev_error) / 2.0;  // trapezoidal-ish
+                total_error = std::clamp(total_error, -max_integral, max_integral);
+            } else {
+                // Optional: reset integral when far from target
+                total_error = 0.0;
+            }
+
+            // Derivative (on error)
             derivative = error - prev_error;
 
-            //calculate speed
-            if (std::fabs(error) < refined_range){
+            // --------------------------------
+            // PICK CONSTANT SET
+            // --------------------------------
+            const constants& c = (std::fabs(error) < refined_range)
+                ? refined_constants
+                : general_constants;
+
+            if (std::fabs(error) < refined_range) {
+                // Inside refined zone, start settle timer
                 settle_timer.start();
-                speed = scale * (refined_constants.kP * error + refined_constants.kI * total_error + refined_constants.kD * derivative);
+            } else {
+                // If you want: reset timer when far away
+                // settle_timer.reset();
+            }
+
+            // --------------------------------
+            // RAW PID OUTPUT
+            // --------------------------------
+            double raw_speed = scale * (c.kP * error +
+                                        c.kI * total_error +
+                                        c.kD * derivative);
+
+            // --------------------------------
+            // SLEW LIMITING (USE PREV_SPEED CORRECTLY)
+            // --------------------------------
+            double delta_speed = raw_speed - prev_speed;
+            if (delta_speed > slew) {
+                speed = prev_speed + slew;
+            }
+            else if (delta_speed < -slew) {
+                speed = prev_speed - slew;
             }
             else {
-                speed = scale * (general_constants.kP * error + general_constants.kI * total_error + general_constants.kD * derivative);
+                speed = raw_speed;
             }
 
-            //capping speed
-            speed = std::clamp(speed, (scale*-127), (scale*127));
+            // Clamp final speed
+            speed = std::clamp(speed, -127.0 * scale, 127.0 * scale);
 
-            //update last values
+            // Update history
             prev_error = error;
             prev_speed = speed;
 
-            double delta_speed = speed - prev_speed;
-
-            //slew
-            if (delta_speed > slew){
-                speed = prev_speed + slew;
-            }
-            else if (delta_speed < -slew){
-                speed = prev_speed - slew;
-            }
-
             return speed;
         }
-
     };
-}
+
+} // namespace lynx

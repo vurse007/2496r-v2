@@ -90,14 +90,14 @@ namespace lynx {
             pros::Rotation* distance_pod;        
 
             PID turn_pid{
-                {1,1,1},
-                {0.5,1,1},
-                0,
+                {2.67,0,29.67},
+                {3,0,0},
+                10,
                 127,
                 0,
                 1000,
                 0,
-                0
+                10
             };
 
             PID drive_pid{
