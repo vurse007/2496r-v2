@@ -8,7 +8,7 @@
 
 namespace global { 
     extern lynx::odometry odom;
-    extern lynx::drive chassis;
+    extern lynx::state_drive chassis;
     extern pros::Controller con;
 }
 

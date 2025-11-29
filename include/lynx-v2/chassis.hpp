@@ -120,7 +120,7 @@ namespace lynx {
                 right.set_brake_mode(mode);
             }
 
-            void move(int left_velocity, int right_velocity) {
+            virtual void move(int left_velocity, int right_velocity) {
                 left.move(left_velocity);
                 right.move(right_velocity);
             }

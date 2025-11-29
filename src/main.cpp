@@ -13,6 +13,8 @@ std::string names;
  * to keep execution time for this mode under a few seconds.
  */
 void initialize() {
+    global::chassis.set_state(lynx::DriveState::CHASSIS_6_INTAKE_2);
+
     global::odom.reset();
     global::imu.reset();
     
@@ -22,7 +24,9 @@ void initialize() {
 
     static Auton temp = autons[auton_selector(autons, global::con)];
     names = temp.get_name1() + " " + temp.get_name2();  // Save display name
-    auton = &temp;     
+    auton = &temp;
+    
+    
 }
 
 /**

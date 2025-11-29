@@ -10,7 +10,7 @@ namespace lynx::util {
             double ticks = device.get_position();
             return (ticks / 36000.0) * (M_PI * global::odom.odom_wheel_diameter);
         }
-        else if constexpr (std::is_same_v<T, lynx::drive>) {
+        else if constexpr (std::is_same_v<T, lynx::drive> || std::is_same_v<T, lynx::state_drive>)  {
             if (device.distance_pod != nullptr) {
                 return get_inches(*device.distance_pod);
             } else {

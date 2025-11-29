@@ -3,10 +3,11 @@
 #pragma once
 #include "main.h" 
 #include "util.hpp"
+#include "state.hpp"
 
 #include <optional> // Forward declaration of wrap_to_pi 
 
-namespace global { extern lynx::drive chassis; }
+namespace global { extern lynx::state_drive chassis; }
 
 namespace lynx {
 

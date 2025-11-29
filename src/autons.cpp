@@ -1,8 +1,9 @@
 #include "lynx.hpp"
 
-
 lynx::Queue queue;
-using namespace global;
+using global::chassis;
+using global::odom;
+using global::con;
 
 void solo_awp_right(){
     queue.start();
