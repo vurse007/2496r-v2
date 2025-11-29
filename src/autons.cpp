@@ -10,8 +10,9 @@ void solo_awp_right(){
 
     std::vector<lynx::Waypoint> path1 = {
         lynx::Waypoint(0, 0, 0, 100),
-        lynx::Waypoint(0, 24, 0, 100)      // Start
-        // lynx::Waypoint(24, 24, 90, 100)
+        lynx::Waypoint(0, 24, 0, 100),      // Start
+        lynx::Waypoint(24, 24, 90, 100),
+        lynx::Waypoint(0, 24, -90, 100)
 
     };
 
