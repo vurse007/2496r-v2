@@ -9,6 +9,7 @@ namespace lynx {
 enum class DriveState {
     CHASSIS_8,                      // 8 motors on drivetrain (4 fixed + 4 shiftable)
     CHASSIS_6_INTAKE_2,             // 6 drivetrain (4 fixed + extraB), 2 intake (extraA)
+    CHASSIS_6_FLYWHEEL_2,           // 6 drivetrain (4 fixed + extraA), 2 flywheel (extraB)
     CHASSIS_4_INTAKE_2_FLYWHEEL_2   // 4 drivetrain (fixed only), 2 intake (extraA), 2 flywheel (extraB)
 };
 
@@ -69,13 +70,16 @@ public:
                 pistonA.set_value(true);    // extraA → drivetrain
                 pistonB.set_value(true);    // extraB → drivetrain
                 break;
-
             case DriveState::CHASSIS_6_INTAKE_2:
                 // A: intake, B: chassis
                 pistonA.set_value(false);   // extraA → intake
                 pistonB.set_value(true);    // extraB → drivetrain
                 break;
-
+            case DriveState::CHASSIS_6_FLYWHEEL_2:
+                // A: chassis, B: flywhel
+                pistonA.set_value(true);    // extraA → drivetrain
+                pistonB.set_value(false);   // extraB → flywheel
+                break;
             case DriveState::CHASSIS_4_INTAKE_2_FLYWHEEL_2:
                 // A: intake, B: flywheel
                 pistonA.set_value(false);   // extraA → intake
@@ -107,7 +111,6 @@ public:
                 if (auto mL = extraB.get_motor(0)) mL->move(left_power);
                 if (auto mR = extraB.get_motor(1)) mR->move(right_power);
                 break;
-
             case DriveState::CHASSIS_6_INTAKE_2:
                 // extraB helps drivetrain
                 if (auto mL = extraB.get_motor(0)) mL->move(left_power);
@@ -131,6 +134,7 @@ public:
                 break; // no intake in pure drivetrain mode
 
             case DriveState::CHASSIS_6_INTAKE_2:
+            case DriveState::CHASSIS_6_FLYWHEEL_2:
             case DriveState::CHASSIS_4_INTAKE_2_FLYWHEEL_2:
                 if (auto mL = extraA.get_motor(0)) mL->move(power);
                 if (auto mR = extraA.get_motor(1)) mR->move(power);
@@ -145,6 +149,7 @@ public:
         switch (curr_state) {
             case DriveState::CHASSIS_8:
             case DriveState::CHASSIS_6_INTAKE_2:
+            case DriveState::CHASSIS_6_FLYWHEEL_2:
                 break; // no flywheel in these modes
 
             case DriveState::CHASSIS_4_INTAKE_2_FLYWHEEL_2:

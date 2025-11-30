@@ -17,6 +17,9 @@ void solo_awp_right(){
 
     };
 
+    chassis.set_state(DriveState::CHASSIS_6_FLYWHEEL_2);
+    
+
     chassis.purePursuit(path1);
 
     //chassis.turn_abs(90, 10000);

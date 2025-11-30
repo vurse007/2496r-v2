@@ -17,16 +17,11 @@ void initialize() {
 
     global::odom.reset();
     global::imu.reset();
-    
-    while (global::imu.is_calibrating()) {
-        pros::delay(20);
-    }
+    while (global::imu.is_calibrating()) pros::delay(20);
 
     static Auton temp = autons[auton_selector(autons, global::con)];
     names = temp.get_name1() + " " + temp.get_name2();  // Save display name
     auton = &temp;
-    
-    
 }
 
 /**
@@ -85,10 +80,7 @@ void opcontrol() {
     global::odom.reset();
     driver_time.restart();
 
-    while (true) {
-        // Update odometry
-        // con.print(0, 0, "IMU: %.2f", imu.get_heading());
-        // pros::delay(100);        
+    while (true) {      
         global::odom.update();
 
         lynx::util::print_info(
@@ -98,16 +90,8 @@ void opcontrol() {
             {odom.current_pos.x, odom.current_pos.y, lynx::util::to_deg(odom.current_pos.theta)}
         );
 
-        if (global::con.get_digital_new_press(E_CONTROLLER_DIGITAL_UP)){
-            (*auton).run();
-        }
-        
-        // if (counter % 50 == 0 && counter % 100 != 0 && counter % 150 != 0) {
-        //     con.print(0, 0, "X: %.2f | Y: %.2f", odom.current_pos.x, odom.current_pos.y);
-        // }
-        // else if (counter % 50 != 0 && counter % 100 != 0 && counter % 150 == 0) {
-        //     con.print(0, 0, "I: %.2f", odom.current_pos.theta);
-        // }
+        driverCon();
+        autonCon();
 
     counter += 1;
     pros::delay(5);

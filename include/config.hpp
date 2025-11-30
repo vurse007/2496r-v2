@@ -37,8 +37,8 @@ namespace global {
         // ---------------------
         // PISTON PORTS
         // ---------------------
-        'H',    // pistonA → routes extraA (chassis <-> flywheel)
-        'G',    // pistonB → routes extraB (chassis <-> intake)
+        'H',    // pistonA → routes extraA (chassis <-> intake)
+        'G',    // pistonB → routes extraB (chassis <-> flywheel)
 
         // ---------------------
         // SHIFTABLE MOTOR GROUP A (piston A)
