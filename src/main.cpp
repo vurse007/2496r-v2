@@ -1,6 +1,5 @@
 #include "main.h"
 #include "lynx.hpp"
-#include "lynx-v2/util.hpp"
 
 extern std::vector<Auton> autons;
 Auton* auton = nullptr;
