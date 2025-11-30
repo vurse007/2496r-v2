@@ -19,9 +19,19 @@ void initialize() {
     global::imu.reset();
     while (global::imu.is_calibrating()) pros::delay(20);
 
-    static Auton temp = autons[auton_selector(autons, global::con)];
-    names = temp.get_name1() + " " + temp.get_name2();  // Save display name
-    auton = &temp;
+    static Auton curr_auto = autons[auton_selector(autons, global::con)];
+    names = curr_auto.get_name1() + " " + curr_auto.get_name2();  // Save display name
+    auton = &curr_auto;
+
+    global::colorSort.set_all(180, 100, 25, "red");
+}
+
+void autonCon(){
+    if (global::con.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_UP)) {
+        if (!pros::competition::is_field_control()) {
+            if (auton != nullptr) { auton->run(); }
+        }
+    }
 }
 
 /**
@@ -82,6 +92,10 @@ void opcontrol() {
 
     while (true) {      
         global::odom.update();
+        global::colorSort.update();
+
+        driverCon();
+        autonCon();
 
         lynx::util::print_info(
             driver_time.elapsed(), 
@@ -89,9 +103,6 @@ void opcontrol() {
             {"X", "Y", "Imu"}, 
             {odom.current_pos.x, odom.current_pos.y, lynx::util::to_deg(odom.current_pos.theta)}
         );
-
-        driverCon();
-        autonCon();
 
     counter += 1;
     pros::delay(5);

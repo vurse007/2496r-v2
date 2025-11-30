@@ -107,16 +107,13 @@ inline void stateCon(){
     if (global::con.get_digital_new_press(DIGITAL_B))    global::chassis.set_state(DriveState::CHASSIS_6_FLYWHEEL_2);  // 6m 200
 }
 
+inline void otherCon(){
+    if (global::con.get_digital_new_press(DIGITAL_LEFT)) {global::colorSort.toggle();} 
+}
+
 inline void driverCon(){
     driver();
     intakeCon();
     stateCon();
 }
 
-inline void autonCon(){
-    if (con.get_digital_new_press(E_CONTROLLER_DIGITAL_UP)) {
-      if (!pros::competition::is_field_control()) {
-        if (auton != nullptr) { auton->run(); }
-      }
-    }
-}

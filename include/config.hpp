@@ -3,14 +3,19 @@
 #include "lynx-v2/chassis.hpp"
 #include "lynx-v2/odom.hpp"
 #include "lynx-v2/state.hpp"
+#include "lynx-v2/sort.hpp"
 
 namespace global {
 
     inline pros::Rotation horizontal_pod(10);
     inline pros::Rotation vertical_pod(16);
     inline pros::Imu imu(7);
-    inline pros::adi::DigitalOut matchLoaderP('A', true);
+    inline pros::adi::Pneumatics matchLoaderP('A', false);
     inline pros::Controller con(pros::E_CONTROLLER_MASTER);
+    
+    inline int opticalPort = 1;
+    inline char sorterPistonPort = 'B';
+    inline lynx::ColorSort colorSort(&opticalPort, &sorterPistonPort);
 
     // ------------------------------------------------------------
     // STATE DRIVE CONFIGURATION (4 fixed chassis + 4 shiftable)
