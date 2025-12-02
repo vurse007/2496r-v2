@@ -2,7 +2,11 @@
 #include "motion.hpp"
 #include "odom.hpp"
 
-namespace global { extern lynx::odometry odom; }
+namespace global { 
+    extern lynx::odometry odom;
+    extern lynx::state_drive chassis;
+    extern pros::Controller con;
+}
 
 inline void lynx::drive::boomerang(double targetx, double targety, double target_theta, 
                                    double dLead, int timeout, double scale) {
