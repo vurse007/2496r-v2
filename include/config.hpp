@@ -9,7 +9,7 @@ namespace global {
 
     inline pros::Rotation horizontal_pod(10);
     inline pros::Rotation vertical_pod(16);
-    inline pros::Imu imu(7);
+    inline pros::Imu imu(14);
     inline pros::adi::Pneumatics matchLoaderP('A', false);
     inline pros::Controller con(pros::E_CONTROLLER_MASTER);
     
@@ -22,19 +22,19 @@ namespace global {
     // ------------------------------------------------------------
     inline lynx::state_drive chassis {
         {
-            {-11, pros::v5::MotorGears::blue},   // left permanent 1
-            { 12, pros::v5::MotorGears::blue}    // left permanent 2
+            {13, pros::v5::MotorGears::blue},   // left permanent 1
+            { -12, pros::v5::MotorGears::blue}    // left permanent 2
         },
         {
-            {-13, pros::v5::MotorGears::blue},   // right permanent 1
-            { 18, pros::v5::MotorGears::blue}    // right permanent 2
+            {1, pros::v5::MotorGears::blue},   // right permanent 1
+            {-2, pros::v5::MotorGears::blue}    // right permanent 2
         },
 
         // ---------------------
         // CHASSIS PARAMETERS
         // ---------------------
-        3.25,   // wheel diameter
-        0.75,   // external gear ratio
+        2.75,   // wheel diameter
+        1,   // external gear ratio
         12.0,   // track width
         &imu,
         &vertical_pod,
@@ -42,23 +42,23 @@ namespace global {
         // ---------------------
         // PISTON PORTS
         // ---------------------
-        'H',    // pistonA → routes extraA (chassis <-> intake)
-        'G',    // pistonB → routes extraB (chassis <-> flywheel)
+        'A',    // pistonA → routes extraA (chassis <-> intake)
+        'B',    // pistonB → routes extraB (chassis <-> flywheel)
 
         // ---------------------
         // SHIFTABLE MOTOR GROUP A (piston A)
         // ---------------------
         std::vector<lynx::motor_specs>{
-            {-19, pros::v5::MotorGears::blue}, // LEFT
-            { 20, pros::v5::MotorGears::blue}  // RIGHT
+            {-20, pros::v5::MotorGears::blue}, // LEFT
+            {10, pros::v5::MotorGears::blue}  // RIGHT
         },
 
         // ---------------------
         // SHIFTABLE MOTOR GROUP B (piston B)
         // ---------------------
         std::vector<lynx::motor_specs>{
-            {-1, pros::v5::MotorGears::blue}, // LEFT
-            {2, pros::v5::MotorGears::blue}   // RIGHT
+            {-11, pros::v5::MotorGears::blue}, // LEFT
+            {3, pros::v5::MotorGears::blue}   // RIGHT
         }
     };
 
