@@ -51,6 +51,8 @@ inline void intakeCon(){
         global::chassis.set_state(DriveState::CHASSIS_6_INTAKE_2);
 
         // -------- piston logic here --------
+        global::intakeRamp.set_value(true);
+        global::fourBarPiston.set_value(false);
 
         // Intake forward
         global::chassis.move_intake(127);
@@ -73,11 +75,13 @@ inline void intakeCon(){
     // ========================================================================
     else if (global::con.get_digital(DIGITAL_L1)) {
 
-        global::chassis.set_state(DriveState::CHASSIS_6_INTAKE_2);
+        global::chassis.set_state(DriveState::CHASSIS_4_INTAKE_2_FLYWHEEL_2);
 
-        // -------- piston logic here --------
+        global::fourBarPiston.set_value(true);
+        global::intakeRamp.set_value(false);
 
         global::chassis.move_intake(127);
+        global::chassis.move_flywheel(127);
     }
 
     // ========================================================================
@@ -85,12 +89,12 @@ inline void intakeCon(){
     // ========================================================================
     else if (global::con.get_digital(DIGITAL_L2)) {
 
-        global::chassis.set_state(DriveState::CHASSIS_4_INTAKE_2_FLYWHEEL_2);
+        global::chassis.set_state(DriveState::CHASSIS_6_INTAKE_2);
 
         // -------- piston logic here --------
+        global::intakeRamp.set_value(false);
 
         global::chassis.move_intake(127);
-        global::chassis.move_flywheel(127);
     }
 
     // ========================================================================
@@ -104,7 +108,13 @@ inline void intakeCon(){
 
 inline void stateCon(){
     if (global::con.get_digital_new_press(DIGITAL_DOWN)) global::chassis.set_state(DriveState::CHASSIS_8);             // 8m 600
-    if (global::con.get_digital_new_press(DIGITAL_B))    global::chassis.set_state(DriveState::CHASSIS_6_FLYWHEEL_2);  // 6m 200
+    if (global::con.get_digital_new_press(DIGITAL_Y))    global::chassis.set_state(DriveState::CHASSIS_6_FLYWHEEL_2);  // 6m 200
+    
+    if (global::con.get_digital_new_press(DIGITAL_RIGHT)) global::matchLoaderP.toggle();
+
+    if (global::con.get_digital_new_press(DIGITAL_B)){
+        global::wingPiston.toggle();
+    }
 }
 
 inline void otherCon(){
