@@ -17,9 +17,9 @@ namespace global {
     inline char sorterPistonPort = 'B';
     inline lynx::ColorSort colorSort(&opticalPort, &sorterPistonPort);
 
-    inline pros::adi::Pneumatics intakeRamp('C', false);
-    inline pros::adi::Pneumatics wingPiston('D', false);
-    inline pros::adi::Pneumatics fourBarPiston('E', false);
+    inline pros::adi::Pneumatics intakeRamp('F', false);
+    inline pros::adi::Pneumatics wingPiston('C', false);
+    inline pros::adi::Pneumatics fourBarPiston('A', false);
 
     // ------------------------------------------------------------
     // STATE DRIVE CONFIGURATION (4 fixed chassis + 4 shiftable)
@@ -46,8 +46,8 @@ namespace global {
         // ---------------------
         // PISTON PORTS
         // ---------------------
-        'H',    // pistonA → routes extraA (chassis <-> intake)
-        'G',    // pistonB → routes extraB (chassis <-> flywheel)
+        'B',    // pistonA → routes extraA (chassis <-> intake)
+        'X',    // pistonB → routes extraB (chassis <-> flywheel)
 
         // ---------------------
         // SHIFTABLE MOTOR GROUP A (piston A)

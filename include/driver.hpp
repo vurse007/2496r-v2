@@ -19,6 +19,9 @@
 
 using namespace lynx;
 
+//DELETE LATERRRRR
+inline int cookedCount = 0;
+
 inline void driver() {
 
     // Single-stick arcade
@@ -121,9 +124,29 @@ inline void otherCon(){
     if (global::con.get_digital_new_press(DIGITAL_LEFT)) {global::colorSort.toggle();} 
 }
 
+inline void cookedCon(){
+    if (global::con.get_digital_new_press(DIGITAL_Y)){
+        cookedCount++;
+        if (cookedCount % 2 == 0){
+            global::chassis.set_state(DriveState::CHASSIS_8);
+        }
+        else if (cookedCount % 2 == 1){
+            global::chassis.set_state(DriveState::CHASSIS_6_INTAKE_2);
+        }
+    }
+    if (global::con.get_digital_new_press(DIGITAL_X)){
+        global::fourBarPiston.toggle();
+    }
+    if (global::con.get_digital_new_press(DIGITAL_A)){
+        global::wingPiston.toggle();
+    }
+    if (global::con.get_digital_new_press(DIGITAL_UP)){
+        global::intakeRamp.toggle();
+    }
+}
+
 inline void driverCon(){
     driver();
-    intakeCon();
-    stateCon();
+    cookedCon();
 }
 
