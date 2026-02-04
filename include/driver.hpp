@@ -44,74 +44,17 @@ inline void driver() {
 }
 
 inline void intakeCon(){   
-    
-    // ========================================================================
-    // 1. STORAGE MODE  — R1 (HOLD)
-    // ========================================================================
-    if (global::con.get_digital(DIGITAL_R1)) {
-
-        // Force to 6-drive, 2-intake (no reverting on release)
-        global::chassis.set_state(DriveState::CHASSIS_6_INTAKE_2);
-
-        // -------- piston logic here --------
-        global::intakeRamp.set_value(true);
-        global::fourBarPiston.set_value(false);
-
-        // Intake forward
-        global::chassis.move_intake(127);
-    }
-
-    // ========================================================================
-    // 2. OUTTAKE — R2 (HOLD)
-    // ========================================================================
-    else if (global::con.get_digital(DIGITAL_R2)) {
-
-        global::chassis.set_state(DriveState::CHASSIS_6_INTAKE_2);
-
-        // -------- piston logic here --------
-
-        global::chassis.move_intake(-127);
-    }
-
-    // ========================================================================
-    // 3. SCORING MODE — LOW GOAL (L1 HOLD)
-    // ========================================================================
-    else if (global::con.get_digital(DIGITAL_L1)) {
-
-        global::chassis.set_state(DriveState::CHASSIS_4_INTAKE_2_FLYWHEEL_2);
-
-        global::fourBarPiston.set_value(true);
-        global::intakeRamp.set_value(false);
-
-        global::chassis.move_intake(127);
-        global::chassis.move_flywheel(127);
-    }
-
-    // ========================================================================
-    // 4. SCORING MODE — HIGH GOAL (L2 HOLD)
-    // ========================================================================
-    else if (global::con.get_digital(DIGITAL_L2)) {
-
-        global::chassis.set_state(DriveState::CHASSIS_6_INTAKE_2);
-
-        // -------- piston logic here --------
-        global::intakeRamp.set_value(false);
-
-        global::chassis.move_intake(127);
-    }
-
-    // ========================================================================
-    // 5. NO BUTTON → STOP MECHANISMS
-    // ========================================================================
-    else {
-        global::chassis.move_intake(0);
-        global::chassis.move_flywheel(0);
+    if (global::con.get_digital(DIGITAL_R1)){
+        global::intake.move(127);
+    } else if (global::con.get_digital(DIGITAL_R2)){
+        global::intake.move(-127);
+    } else {
+        global::intake.move(0);
     }
 }
 
 inline void stateCon(){
-    if (global::con.get_digital_new_press(DIGITAL_DOWN)) global::chassis.set_state(DriveState::CHASSIS_8);             // 8m 600
-    if (global::con.get_digital_new_press(DIGITAL_Y))    global::chassis.set_state(DriveState::CHASSIS_6_FLYWHEEL_2);  // 6m 200
+    if (global::con.get_digital_new_press(DIGITAL_DOWN)) global::drivetrainPTO.toggle();             // 8m 600
     
     if (global::con.get_digital_new_press(DIGITAL_RIGHT)) global::matchLoaderP.toggle();
 
@@ -124,29 +67,9 @@ inline void otherCon(){
     if (global::con.get_digital_new_press(DIGITAL_LEFT)) {global::colorSort.toggle();} 
 }
 
-inline void cookedCon(){
-    if (global::con.get_digital_new_press(DIGITAL_Y)){
-        cookedCount++;
-        if (cookedCount % 2 == 0){
-            global::chassis.set_state(DriveState::CHASSIS_8);
-        }
-        else if (cookedCount % 2 == 1){
-            global::chassis.set_state(DriveState::CHASSIS_6_INTAKE_2);
-        }
-    }
-    if (global::con.get_digital_new_press(DIGITAL_X)){
-        global::fourBarPiston.toggle();
-    }
-    if (global::con.get_digital_new_press(DIGITAL_A)){
-        global::wingPiston.toggle();
-    }
-    if (global::con.get_digital_new_press(DIGITAL_UP)){
-        global::intakeRamp.toggle();
-    }
-}
-
 inline void driverCon(){
     driver();
-    cookedCon();
+    intakeCon();
+    stateCon();
 }
 
