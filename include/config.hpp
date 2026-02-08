@@ -14,7 +14,9 @@ namespace global {
     inline pros::adi::Pneumatics matchLoaderP('A', false);
     inline pros::Controller con(pros::E_CONTROLLER_MASTER);
 
-    inline pros::MotorGroup intake({3, 4}, pros::v5::MotorGears::blue);
+    inline pros::MotorGroup intake({-3, 4}, pros::v5::MotorGears::blue);
+    inline pros::Motor intakeR(-3, pros::v5::MotorGears::blue);
+    inline pros::Motor intakeL(4, pros::v5::MotorGears::blue);
     
     inline int opticalPort = 1;
     inline char sorterPistonPort = 'B';
@@ -24,29 +26,52 @@ namespace global {
     inline pros::adi::Pneumatics wingPiston('C', false);
     inline pros::adi::Pneumatics fourBarPiston('A', false);
 
-    inline lynx::drive chassis {
-        //left motors
+    // ------------------------------------------------------------
+    // STATE DRIVE CONFIGURATION (4 fixed chassis + 4 shiftable)
+    // ------------------------------------------------------------
+    inline lynx::state_drive chassis {
         {
-            {13, pros::v5::MotorGears::blue},
-            {-12, pros::v5::MotorGears::blue},
-            {-20, pros::v5::MotorGears::blue}
+            {13, pros::v5::MotorGears::blue},   // left permanent 1
+            { -12, pros::v5::MotorGears::blue},   // left permanent 2
+            {67, pros::v5::MotorGears::blue}
         },
-        //right motors
         {
-            {1, pros::v5::MotorGears::blue},
-            {-2, pros::v5::MotorGears::blue},
-            {10, pros::v5::MotorGears::blue}
+            {1, pros::v5::MotorGears::blue},   // right permanent 1
+            {-2, pros::v5::MotorGears::blue},    // right permanent 2
+            {68, pros::v5::MotorGears::blue}
         },
 
-        //chassis params
+        // ---------------------
+        // CHASSIS PARAMETERS
+        // ---------------------
         2.75,   // wheel diameter
-        1,      // external gear ratio
+        1,   // external gear ratio
         12.0,   // track width
         &imu,
-        &vertical_pod
-    };
+        &vertical_pod,
 
-    inline lynx::PTO drivetrainPTO('D', false);
+        // ---------------------
+        // PISTON PORTS
+        // ---------------------
+        'B',    // pistonA → routes extraA (chassis <-> intake)
+        'X',    // pistonB → routes extraB (chassis <-> flywheel)
+
+        // ---------------------
+        // SHIFTABLE MOTOR GROUP A (piston A)
+        // ---------------------
+        std::vector<lynx::motor_specs>{
+            {-20, pros::v5::MotorGears::blue}, // LEFT
+            {10, pros::v5::MotorGears::blue}  // RIGHT
+        },
+
+        // ---------------------
+        // SHIFTABLE MOTOR GROUP B (piston B)
+        // ---------------------
+        std::vector<lynx::motor_specs>{
+            {-11, pros::v5::MotorGears::blue}, // LEFT
+            {3, pros::v5::MotorGears::blue}   // RIGHT
+        }
+    };
 
     // ------------------------------------------------------------
     // ODOMETRY CONFIG (unchanged)

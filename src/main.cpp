@@ -12,7 +12,7 @@ std::string names;
  * to keep execution time for this mode under a few seconds.
  */
 void initialize() {
-    global::chassis.set_state(lynx::DriveState::CHASSIS_6_INTAKE_2);
+    //global::chassis.set_state(lynx::DriveState::CHASSIS_6_INTAKE_2);
 
     global::odom.reset();
     global::imu.reset();
@@ -22,11 +22,11 @@ void initialize() {
     names = curr_auto.get_name1() + " " + curr_auto.get_name2();  // Save display name
     auton = &curr_auto;
 
-    global::colorSort.set_all(180, 100, 25, "red");
+    //global::colorSort.set_all(180, 100, 25, "red");
 }
 
 void autonCon(){
-    if (global::con.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_UP)) {
+    if (global::con.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_LEFT)) {
         if (!pros::competition::is_field_control()) {
             if (auton != nullptr) { auton->run(); }
         }

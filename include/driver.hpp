@@ -41,30 +41,56 @@ inline void driver() {
 
     // state_drive overrides move() so routing is automatic
     global::chassis.move(left_power, right_power);
+
 }
 
 inline void intakeCon(){   
     if (global::con.get_digital(DIGITAL_R1)){
-        global::intake.move(127);
-    } else if (global::con.get_digital(DIGITAL_R2)){
-        global::intake.move(-127);
-    } else {
+        chassis.set_state(DriveState::CHASSIS_6_INTAKE_2);
+        chassis.move_intake(127);
+        global::intakeRamp.set_value(true);
+    } 
+    else if (global::con.get_digital(DIGITAL_R2)){
+        chassis.set_state(DriveState::CHASSIS_6_INTAKE_2);
+        chassis.move_intake(-127);
+    } 
+    else if (global::con.get_digital(DIGITAL_L1)){
+        chassis.set_state(DriveState::CHASSIS_6_INTAKE_2);
+        chassis.move_intake(127);
+        global::intakeRamp.set_value(false);
+        global::fourBarPiston.set_value(true);
+    }
+    else if (global::con.get_digital(DIGITAL_L2)){
+        chassis.set_state(DriveState::CHASSIS_6_INTAKE_2);
+        chassis.move_intake(127);
+        global::intakeRamp.set_value(false);
+        global::fourBarPiston.set_value(false);
+    }
+    else {
         global::intake.move(0);
     }
 }
 
 inline void stateCon(){
-    if (global::con.get_digital_new_press(DIGITAL_DOWN)) global::drivetrainPTO.toggle();             // 8m 600
+    if (global::con.get_digital_new_press(DIGITAL_DOWN)) {
+        chassis.set_state(DriveState::CHASSIS_8);
+    }
     
-    if (global::con.get_digital_new_press(DIGITAL_RIGHT)) global::matchLoaderP.toggle();
+    if (global::con.get_digital_new_press(DIGITAL_Y)) global::matchLoaderP.toggle();
 
     if (global::con.get_digital_new_press(DIGITAL_B)){
         global::wingPiston.toggle();
     }
 }
 
+inline void manualPistonsCon(){
+    if(global::con.get_digital_new_press(DIGITAL_UP)){
+        global::intakeRamp.toggle();
+    }
+}
+
 inline void otherCon(){
-    if (global::con.get_digital_new_press(DIGITAL_LEFT)) {global::colorSort.toggle();} 
+    //if (global::con.get_digital_new_press(DIGITAL_LEFT)) {global::colorSort.toggle();} 
 }
 
 inline void driverCon(){
