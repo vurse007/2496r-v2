@@ -32,9 +32,17 @@ inline void driver() {
     if (std::abs(forward) < 5) forward = 0;
     if (std::abs(turn)    < 5) turn    = 0;
 
+    if (turn < 0) {
+        turn = abs(turn);
+    }
+    long long curvedturn = ((-5.34362)*(10e-7)*(turn*turn*turn*turn))+((0.0000248097)*(turn*turn*turn))+((0.0132827)*(turn*turn));
+    if (turn < 0){
+        curvedturn = -curvedturn;
+    }
+
     // Arcade mixing
-    int left_power  = forward + turn;
-    int right_power = forward - turn;
+    int left_power  = forward + curvedturn;
+    int right_power = forward - curvedturn;
 
     left_power  = std::clamp(left_power,  -127, 127);
     right_power = std::clamp(right_power, -127, 127);
@@ -48,6 +56,7 @@ inline void intakeCon(){
     if (global::con.get_digital(DIGITAL_R1)){
         global::chassis.set_state(DriveState::CHASSIS_6_INTAKE_2);
         global::chassis.move_intake(127);
+        global::fourBarPiston.set_value(false);
         global::intakeRamp.set_value(true);
     } 
     else if (global::con.get_digital(DIGITAL_R2)){

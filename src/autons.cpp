@@ -23,7 +23,13 @@ void solo_awp_right(){
 }
 
 void half_left_red(){
-    queue.start();
+    //queue.start();
+    global::chassis.move_intake(80);
+    global::chassis.straight(30);
+    global::chassis.turn_abs(-135);
+    global::chassis.move_intake(0);
+    global::chassis.straight(-5);
+    global::chassis.move_intake(127);
 }
 
 void half_left_blue(){
@@ -40,6 +46,9 @@ void half_right_blue(){
 
 void skills_auton(){
     queue.start();
+    global::chassis.move(67,67);
+    delay(150);
+    global::chassis.move(0,0);
 }
 
 void blank(){
