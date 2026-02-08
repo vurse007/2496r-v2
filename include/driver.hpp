@@ -67,7 +67,7 @@ inline void intakeCon(){
         global::fourBarPiston.set_value(false);
     }
     else {
-        global::intake.move(0);
+        global::chassis.move_intake(0);
     }
 }
 
@@ -97,5 +97,6 @@ inline void driverCon(){
     driver();
     intakeCon();
     stateCon();
+    manualPistonsCon();
 }
 
