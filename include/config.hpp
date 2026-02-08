@@ -51,10 +51,9 @@ namespace global {
         &vertical_pod,
 
         // ---------------------
-        // PISTON PORTS
+        // PISTON PORT
         // ---------------------
         'B',    // pistonA → routes extraA (chassis <-> intake)
-        'X',    // pistonB → routes extraB (chassis <-> flywheel)
 
         // ---------------------
         // SHIFTABLE MOTOR GROUP A (piston A)
@@ -62,14 +61,6 @@ namespace global {
         std::vector<lynx::motor_specs>{
             {-20, pros::v5::MotorGears::blue}, // LEFT
             {10, pros::v5::MotorGears::blue}  // RIGHT
-        },
-
-        // ---------------------
-        // SHIFTABLE MOTOR GROUP B (piston B)
-        // ---------------------
-        std::vector<lynx::motor_specs>{
-            {-11, pros::v5::MotorGears::blue}, // LEFT
-            {3, pros::v5::MotorGears::blue}   // RIGHT
         }
     };
 

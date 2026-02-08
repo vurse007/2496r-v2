@@ -46,23 +46,23 @@ inline void driver() {
 
 inline void intakeCon(){   
     if (global::con.get_digital(DIGITAL_R1)){
-        chassis.set_state(DriveState::CHASSIS_6_INTAKE_2);
-        chassis.move_intake(127);
+        global::chassis.set_state(DriveState::CHASSIS_6_INTAKE_2);
+        global::chassis.move_intake(127);
         global::intakeRamp.set_value(true);
     } 
     else if (global::con.get_digital(DIGITAL_R2)){
-        chassis.set_state(DriveState::CHASSIS_6_INTAKE_2);
-        chassis.move_intake(-127);
+        global::chassis.set_state(DriveState::CHASSIS_6_INTAKE_2);
+        global::chassis.move_intake(-127);
     } 
     else if (global::con.get_digital(DIGITAL_L1)){
-        chassis.set_state(DriveState::CHASSIS_6_INTAKE_2);
-        chassis.move_intake(127);
+        global::chassis.set_state(DriveState::CHASSIS_6_INTAKE_2);
+        global::chassis.move_intake(127);
         global::intakeRamp.set_value(false);
         global::fourBarPiston.set_value(true);
     }
     else if (global::con.get_digital(DIGITAL_L2)){
-        chassis.set_state(DriveState::CHASSIS_6_INTAKE_2);
-        chassis.move_intake(127);
+        global::chassis.set_state(DriveState::CHASSIS_6_INTAKE_2);
+        global::chassis.move_intake(127);
         global::intakeRamp.set_value(false);
         global::fourBarPiston.set_value(false);
     }
@@ -73,7 +73,7 @@ inline void intakeCon(){
 
 inline void stateCon(){
     if (global::con.get_digital_new_press(DIGITAL_DOWN)) {
-        chassis.set_state(DriveState::CHASSIS_8);
+        global::chassis.set_state(DriveState::CHASSIS_8);
     }
     
     if (global::con.get_digital_new_press(DIGITAL_Y)) global::matchLoaderP.toggle();
