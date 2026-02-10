@@ -104,7 +104,7 @@ namespace lynx {
                 {8, 0.005, 1.67},      // general_constants: kp, ki, kd
                 {3, 0.005, 1.67},      // refined_constants
                 1.4,                // refined_range
-                0.35,               // slew
+                127,               // slew
                 30,                 // integral_threshold
                 200,                // max_integral
                 0,                  // deadband
