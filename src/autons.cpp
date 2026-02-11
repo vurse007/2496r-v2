@@ -24,15 +24,7 @@ void solo_awp_right(){
 
 void half_left_red(){
     queue.start();
-    global::chassis.set_state(lynx::DriveState::CHASSIS_6_INTAKE_2);
-    global::chassis.move_intake(127);
-    //delay(5000);
-    global::chassis.straight(30);
-    delay(1000);
-    // global::chassis.turn_abs(-135);
-    // global::chassis.move_intake(0);
-    // global::chassis.straight(-5);
-    // global::chassis.move_intake(127);
+    global::chassis.turn_abs(90);
 }
 
 void half_left_blue(){

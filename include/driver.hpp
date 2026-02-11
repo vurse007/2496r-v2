@@ -32,17 +32,9 @@ inline void driver() {
     if (std::abs(forward) < 5) forward = 0;
     if (std::abs(turn)    < 5) turn    = 0;
 
-    if (turn < 0) {
-        turn = abs(turn);
-    }
-    long long curvedturn = ((-5.34362)*(10e-7)*(turn*turn*turn*turn))+((0.0000248097)*(turn*turn*turn))+((0.0132827)*(turn*turn));
-    if (turn < 0){
-        curvedturn = -curvedturn;
-    }
-
     // Arcade mixing
-    int left_power  = forward + curvedturn;
-    int right_power = forward - curvedturn;
+    int left_power  = forward + turn;
+    int right_power = forward - turn;
 
     left_power  = std::clamp(left_power,  -127, 127);
     right_power = std::clamp(right_power, -127, 127);
