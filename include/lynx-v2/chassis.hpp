@@ -43,7 +43,7 @@ namespace lynx {
                 }
             }
 
-            std::shared_ptr<pros::Motor> get_motor(int index) {
+            std::shared_ptr<pros::Motor> get_motor(int index) const {
                 if (index >=0 && index < motors.size()) {
                     return motors[index];
                 } else{
@@ -62,6 +62,19 @@ namespace lynx {
                 }
                 if (count == 0) return 0.0;
                 return total_pos/count;
+            }
+
+            double get_avg_temp() const {
+                double total_temp = 0.0;
+                int count = 0;
+                for (auto& motor : motors) {
+                    if (motor) {
+                        total_temp += motor->get_temperature();
+                        count++;
+                    }
+                }
+                if (count == 0) return 0.0;
+                return total_temp/count;
             }
 
             const std::vector<std::shared_ptr<pros::Motor>>& get_motors() const {

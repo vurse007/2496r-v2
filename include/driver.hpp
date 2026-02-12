@@ -44,6 +44,15 @@ inline void driver() {
 
 }
 
+inline void printTemps(){
+    lynx::util::print_info(
+        pros::millis(),
+        &global::con,
+        std::vector<std::string>{"ChasRT", "ChasLT", "IntRT", "IntLT"},
+        std::vector<double>{global::chassis.right.get_avg_temp(), global::chassis.left.get_avg_temp(), global::chassis.get_extra_temp(0), global::chassis.get_extra_temp(1)}
+    );
+}
+
 inline void intakeCon(){   
     if (global::con.get_digital(DIGITAL_R1)){
         global::chassis.set_state(DriveState::CHASSIS_6_INTAKE_2);

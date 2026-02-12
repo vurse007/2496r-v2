@@ -93,6 +93,11 @@ public:
     // --------------------------------------------------------------
     // INTAKE CONTROL — extraA is ALWAYS intake in states 2 and 3
     // --------------------------------------------------------------
+    double get_extra_temp(int index) const {
+        auto m = extraA.get_motor(index);
+        return m ? m->get_temperature() : 0.0;
+    }
+
     void move_intake(int power) {
         switch (curr_state) {
             case DriveState::CHASSIS_8:
