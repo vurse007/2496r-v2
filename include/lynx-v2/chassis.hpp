@@ -90,8 +90,8 @@ namespace lynx {
             pros::Rotation* distance_pod;        
 
             PID turn_pid{
-                {2.37,0,32.67},
-                {3,0,0},
+                {4.0,0,80.67}, // 2.37, 0 , 32.67
+                {2,0,0},
                 10,
                 127,
                 0,
@@ -101,7 +101,7 @@ namespace lynx {
             };
 
             PID drive_pid{
-                {8, 0.005, 1.67},      // general_constants: kp, ki, kd
+                {4.5, 0.005, 20.67},      // general_constants: kp, ki, kd
                 {3, 0.005, 1.67},      // refined_constants
                 1.4,                // refined_range
                 127,               // slew

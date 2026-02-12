@@ -88,6 +88,8 @@ void opcontrol() {
     global::con.clear();
     global::odom.reset();
     driver_time.restart();
+    global::chassis.set_brake_mode(MOTOR_BRAKE_COAST);
+
 
     while (true) {      
         global::odom.update();
