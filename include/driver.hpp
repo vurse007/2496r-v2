@@ -107,6 +107,7 @@ inline void driverCon(){
     driver();
     intakeCon();
     stateCon();
+    printTemps();
     manualPistonsCon();
 }
 
