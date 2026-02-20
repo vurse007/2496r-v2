@@ -52,20 +52,27 @@ inline void printTemps(){
     );
 }
 
-inline void intakeCon(){   
+inline void intakeCon(){  
+    if(global::con.get_digital_new_press(DIGITAL_X)){
+        manualIntakeRamp++;
+    }  
     if (global::con.get_digital(DIGITAL_R1)){
         global::set_intake(global::intakeState::STORAGE);
+        global::chassis.set_state(CHASSIS_6_INTAKE_2);
         global::chassis.move_intake(127);
     }
     else if (global::con.get_digital(DIGITAL_R2)){
+        global::chassis.set_state(CHASSIS_6_INTAKE_2);
         global::chassis.move_intake(-127);
     }
     else if (global::con.get_digital(DIGITAL_L1)){
         global::set_intake(global::intakeState::HIGH_GOAL);
+        global::chassis.set_state(CHASSIS_6_INTAKE_2);
         global::chassis.move_intake(127);
     }
     else if (global::con.get_digital(DIGITAL_L2)){
         global::set_intake(global::intakeState::MID_GOAL);
+        global::chassis.set_state(CHASSIS_6_INTAKE_2);
         global::chassis.move_intake(77);
     }
     else {
@@ -86,11 +93,11 @@ inline void intakeCon(){
 }
 
 inline void stateCon(){
-    if (global::con.get_digital_new_press(DIGITAL_DOWN)) {
+    if (global::con.get_digital_new_press(DIGITAL_Y)) {
         global::chassis.set_state(DriveState::CHASSIS_8);
     }
     
-    if (global::con.get_digital_new_press(DIGITAL_Y)) global::matchLoaderP.toggle();
+    if (global::con.get_digital_new_press(DIGITAL_RIGHT)) global::matchLoaderP.toggle();
 
     if (global::con.get_digital_new_press(DIGITAL_B)){
         global::wingPiston.toggle();
