@@ -69,6 +69,7 @@ inline void intakeCon(){
         global::chassis.move_intake(77);
     }
     else {
+        global::chassis.move_intake(0);
         if (manualIntakeRamp == 0){
             global::set_intake(global::intakeState::STORAGE);
         }
@@ -104,6 +105,6 @@ inline void driverCon(){
     driver();
     intakeCon();
     stateCon();
-    printTemps();
+    //printTemps();
 }
 
