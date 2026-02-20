@@ -93,7 +93,7 @@ void opcontrol() {
 
     while (true) {      
         global::odom.update();
-        global::colorSort.update();
+        //global::colorSort.update();
 
         driverCon();
         autonCon();

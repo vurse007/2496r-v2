@@ -19,8 +19,7 @@
 
 using namespace lynx;
 
-//DELETE LATERRRRR
-inline int cookedCount = 0;
+inline int manualIntakeRamp = 0;
 
 inline void driver() {
 
@@ -55,29 +54,33 @@ inline void printTemps(){
 
 inline void intakeCon(){   
     if (global::con.get_digital(DIGITAL_R1)){
-        global::chassis.set_state(DriveState::CHASSIS_6_INTAKE_2);
+        global::set_intake(global::intakeState::STORAGE);
         global::chassis.move_intake(127);
-        global::fourBarPiston.set_value(false);
-        global::intakeRamp.set_value(true);
-    } 
+    }
     else if (global::con.get_digital(DIGITAL_R2)){
-        global::chassis.set_state(DriveState::CHASSIS_6_INTAKE_2);
         global::chassis.move_intake(-127);
-    } 
+    }
     else if (global::con.get_digital(DIGITAL_L1)){
-        global::chassis.set_state(DriveState::CHASSIS_6_INTAKE_2);
+        global::set_intake(global::intakeState::HIGH_GOAL);
         global::chassis.move_intake(127);
-        global::intakeRamp.set_value(false);
-        global::fourBarPiston.set_value(true);
     }
     else if (global::con.get_digital(DIGITAL_L2)){
-        global::chassis.set_state(DriveState::CHASSIS_6_INTAKE_2);
-        global::chassis.move_intake(127);
-        global::intakeRamp.set_value(false);
-        global::fourBarPiston.set_value(false);
+        global::set_intake(global::intakeState::MID_GOAL);
+        global::chassis.move_intake(77);
     }
     else {
-        global::chassis.move_intake(0);
+        if (manualIntakeRamp == 0){
+            global::set_intake(global::intakeState::STORAGE);
+        }
+        else if (manualIntakeRamp == 1){
+            global::set_intake(global::intakeState::HIGH_GOAL);
+        }
+        else if (manualIntakeRamp == 2){
+            global::set_intake(global::intakeState::MID_GOAL);
+        }
+        else {
+            manualIntakeRamp = 0;
+        }
     }
 }
 
@@ -93,12 +96,6 @@ inline void stateCon(){
     }
 }
 
-inline void manualPistonsCon(){
-    if(global::con.get_digital_new_press(DIGITAL_UP)){
-        global::intakeRamp.toggle();
-    }
-}
-
 inline void otherCon(){
     //if (global::con.get_digital_new_press(DIGITAL_LEFT)) {global::colorSort.toggle();} 
 }
@@ -108,6 +105,5 @@ inline void driverCon(){
     intakeCon();
     stateCon();
     printTemps();
-    manualPistonsCon();
 }
 

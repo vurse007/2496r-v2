@@ -14,26 +14,46 @@ namespace global {
     inline pros::Controller con(pros::E_CONTROLLER_MASTER);
     
     inline int opticalPort = 1;
-    inline char sorterPistonPort = 'B';
-    inline lynx::ColorSort colorSort(&opticalPort, &sorterPistonPort);
+    // inline char sorterPistonPort = 'B';
+    // inline lynx::ColorSort colorSort(&opticalPort, &sorterPistonPort);
 
-    inline pros::adi::Pneumatics intakeRamp('E', false);
+    inline pros::adi::Pneumatics intakeRampLower('E', false);
+    inline pros::adi::Pneumatics intakeRampUpper('F', false);
     inline pros::adi::Pneumatics wingPiston('B', false);
-    inline pros::adi::Pneumatics fourBarPiston('A', false);
+
+    enum class intakeState {
+        MID_GOAL,
+        STORAGE,
+        HIGH_GOAL
+    };
+
+    inline void set_intake(intakeState state){
+        switch(state){
+            case intakeState::MID_GOAL:
+                intakeRampLower.set_value(false);
+                intakeRampUpper.set_value(false);
+            case intakeState::STORAGE:
+                intakeRampLower.set_value(true);
+                intakeRampUpper.set_value(false);
+            case intakeState::HIGH_GOAL:
+                intakeRampLower.set_value(true);
+                intakeRampUpper.set_value(true);
+        }
+    }
 
     // ------------------------------------------------------------
     // STATE DRIVE CONFIGURATION (4 fixed chassis + 4 shiftable)
     // ------------------------------------------------------------
     inline lynx::state_drive chassis {
         {
-            {18, pros::v5::MotorGears::blue},   // left permanent 1
-            {-17, pros::v5::MotorGears::blue},    // left permanent 2
-            {-19, pros::v5::MotorGears::blue}
+            {3, pros::v5::MotorGears::blue},   // left permanent 1
+            {-4, pros::v5::MotorGears::blue},    // left permanent 2
+            {-2, pros::v5::MotorGears::blue}
         },
         {
             {-8, pros::v5::MotorGears::blue},   // right permanent 1
-            {7, pros::v5::MotorGears::blue},    // right permanent 2
-            {10, pros::v5::MotorGears::blue}
+            {9, pros::v5::MotorGears::blue},    // right permanent 2
+            {7, pros::v5::MotorGears::blue}
         },
 
         // ---------------------
@@ -53,8 +73,8 @@ namespace global {
         // SHIFTABLE MOTOR GROUP A (piston A)
         // ---------------------
         std::vector<lynx::motor_specs>{
-            {20, pros::v5::MotorGears::blue}, // LEFT
-            {-9, pros::v5::MotorGears::blue}  // RIGHT
+            {1, pros::v5::MotorGears::blue}, // LEFT
+            {-10, pros::v5::MotorGears::blue}  // RIGHT
         }
     };
 

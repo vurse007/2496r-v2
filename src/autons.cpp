@@ -30,39 +30,6 @@ void half_left_red(){
 }
 
 void half_left_blue(){
-    delay(1);
-    global::intakeRamp.set_value(true);
-    //global::chassis.move_intake(127);
-    global::chassis.straight(14);
-    global::chassis.turn_abs(-42);
-    global::chassis.straight(17.5, 1500, 0.4);
-    delay(700);
-    global::chassis.turn_abs(-135);
-    global::chassis.straight(-13.5);
-    global::intakeRamp.set_value(false);
-    delay(1500);
-    global::intakeRamp.set_value(true);
-    global::chassis.straight(47);
-    delay(200);
-    global::chassis.turn_abs(180, 600);
-    global::chassis.straight(-10, 200);
-    global::matchLoaderP.set_value(true);
-
-    global::chassis.straight(12, 600, 0.5);
-    delay(1000);
-    global::fourBarPiston.set_value(true);
-    global::chassis.straight(-20, 1500, 0.8);
-    global::matchLoaderP.set_value(false);
-    global::intakeRamp.set_value(false);
-    delay(1000);
-    global::chassis.straight(7, 300);
-    // global::chassis.move(-60, 127);
-    // delay(500);
-    // global::chassis.turn_abs(0);
-    // global::wingPiston.set_value(false);
-    // global::chassis.straight(15, 900);
-    global::chassis.set_brake_mode(MOTOR_BRAKE_HOLD);
-
 
 }
 
