@@ -39,6 +39,9 @@ inline void lynx::drive::straight(double target, int timeout, double scale) {
     double init_heading = global::chassis.imu->get_heading();
     double init_pos     = util::get_inches(global::chassis);
 
+    turn_pid.reset();
+    drive_pid.reset();
+
     while (true) {
         global::odom.update();
         curr_pos = util::get_inches(global::chassis) - init_pos;
@@ -86,6 +89,7 @@ inline void lynx::drive::turn_abs(double target, int timeout, double scale) {
 
     // Settle timer (we fix the logic here)
     turn_pid.settle_timer.reset();
+    turn_pid.reset();
 
     double heading_error = 0.0;
 

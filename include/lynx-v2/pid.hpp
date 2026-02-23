@@ -88,13 +88,13 @@ namespace lynx {
                 ? refined_constants
                 : general_constants;
 
-            if (std::fabs(error) < refined_range) {
-                // Inside refined zone, start settle timer
-                settle_timer.start();
-            } else {
-                // If you want: reset timer when far away
-                // settle_timer.reset();
-            }
+            // if (std::fabs(error) < refined_range) {
+            //     // Inside refined zone, start settle timer
+            //     settle_timer.start();
+            // } else {
+            //     // If you want: reset timer when far away
+            //     // settle_timer.reset();
+            // } --> COVERED BY MOTION ALGORITHM (ALREADY STARTS IT)
 
             // --------------------------------
             // RAW PID OUTPUT
@@ -125,6 +125,16 @@ namespace lynx {
             prev_speed = speed;
 
             return speed;
+        }
+
+        inline void reset() {
+            error = 0.0;
+            prev_error = 0.0;
+            total_error = 0.0;
+            derivative = 0.0;
+            prev_speed = 0.0;
+            speed = 0.0;
+            settle_timer.reset();
         }
     };
 
