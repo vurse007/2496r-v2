@@ -19,7 +19,7 @@ namespace global {
 
     inline pros::adi::Pneumatics intakeRampLower('E', false);
     inline pros::adi::Pneumatics intakeRampUpper('F', false);
-    inline pros::adi::Pneumatics wingPiston('B', false);
+    inline pros::adi::Pneumatics wingPiston('A', false);
 
     enum class intakeState {
         MID_GOAL,
@@ -30,14 +30,17 @@ namespace global {
     inline void set_intake(intakeState state){
         switch(state){
             case intakeState::MID_GOAL:
+                intakeRampLower.set_value(true);
+                intakeRampUpper.set_value(false);
+                break;
+            case intakeState::STORAGE:
                 intakeRampLower.set_value(false);
                 intakeRampUpper.set_value(false);
-            case intakeState::STORAGE:
-                intakeRampLower.set_value(true);
-                intakeRampUpper.set_value(false);
+                break;
             case intakeState::HIGH_GOAL:
-                intakeRampLower.set_value(true);
+                intakeRampLower.set_value(false);
                 intakeRampUpper.set_value(true);
+                break;
         }
     }
 
@@ -73,8 +76,8 @@ namespace global {
         // SHIFTABLE MOTOR GROUP A (piston A)
         // ---------------------
         std::vector<lynx::motor_specs>{
-            {1, pros::v5::MotorGears::blue}, // LEFT
-            {-10, pros::v5::MotorGears::blue}  // RIGHT
+            {-1, pros::v5::MotorGears::blue}, // LEFT
+            {10, pros::v5::MotorGears::blue}  // RIGHT
         }
     };
 

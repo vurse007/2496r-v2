@@ -104,8 +104,8 @@ public:
                 break; // no intake in pure drivetrain mode
 
             case DriveState::CHASSIS_6_INTAKE_2:
-                if (auto mL = extraA.get_motor(0)) mL->move(power);
-                if (auto mR = extraA.get_motor(1)) mR->move(power);
+                if (auto mL = extraA.get_motor(0)) mL->move(-power);
+                if (auto mR = extraA.get_motor(1)) mR->move(-power);
                 break;
         }
     }

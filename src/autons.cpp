@@ -28,7 +28,19 @@ void half_left_red(){
 }
 
 void half_left_blue(){
+    queue.start();
+    odom.reset(0, 0, 0);
 
+    chassis.turn_abs(90);
+
+    // std::vector<lynx::Waypoint> path1 = {
+    //     lynx::Waypoint(0, 0, 0, 100),
+    //     lynx::Waypoint(0, 24, 0, 100)
+    // };
+
+    
+
+    // chassis.purePursuit(path1);
 }
 
 void half_right_red(){

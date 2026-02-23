@@ -63,6 +63,9 @@ void competition_initialize() {}
  * from where it left off.
  */
 void autonomous() {
+
+    
+
     if (auton) {(*auton).run();} 
 }
 

@@ -100,28 +100,38 @@ namespace lynx {
             const double track_width;
 
             pros::Imu* imu;
-            pros::Rotation* distance_pod;        
+            pros::Rotation* distance_pod;
+
+            //heading correction
+            // {6.7, 0.01, 0},      // general_constants: kp, ki, kd
+            //     {0, 0, 0},      // refined_constants
+            //     0,                // refined_range
+            //     127,               // slew
+            //     30,                 // integral_threshold
+            //     200,                // max_integral
+            //     0,                  // deadband
+            //     10000
 
             PID turn_pid{
-                {4.0,0,80.67}, // 2.37, 0 , 32.67
-                {2,0,0},
-                10,
-                127,
-                0,
-                1000,
-                0,
-                10
-            };
-
-            PID drive_pid{
-                {4.5, 0.005, 20.67},      // general_constants: kp, ki, kd
-                {3, 0.005, 1.67},      // refined_constants
-                1.4,                // refined_range
+                {6.7, 0.01, 70},      // general_constants: kp, ki, kd
+                {5.6, 0, 105},      // refined_constants
+                7,                // refined_range
                 127,               // slew
                 30,                 // integral_threshold
                 200,                // max_integral
                 0,                  // deadband
-                40                  // settle_timer_target (8 checks * 5ms)
+                10000
+            };
+
+            PID drive_pid{
+                {17, 0.0001, 290},      // general_constants: kp, ki, kd
+                {0, 0, 0},      // refined_constants
+                0,                // refined_range
+                127,               // slew
+                30,                 // integral_threshold
+                200,                // max_integral
+                0,                  // deadband
+                10000                  // settle_timer_target (8 checks * 5ms)
             };
 
             drive(const std::vector<motor_specs>& ls, const std::vector<motor_specs>& rs, const double wd, const double egr, const double tw, pros::Imu* imu, pros::Rotation* distance_pod):
