@@ -64,6 +64,8 @@ namespace lynx {
             // --------------------------------
             error = tgt - curr;
 
+            double raw_error = error; // save before deadband clamps it
+
             // Deadband: treat very small error as zero
             if (std::fabs(error) < deadband) {
                 error = 0.0;
@@ -71,15 +73,13 @@ namespace lynx {
 
             // Integral (with threshold & clamping)
             if (std::fabs(error) < integral_threshold) {
-                total_error += (error + prev_error) / 2.0;  // trapezoidal-ish
+                total_error += (error + prev_error) / 2.0;
                 total_error = std::clamp(total_error, -max_integral, max_integral);
-            } else {
-                // Optional: reset integral when far from target
-                total_error = 0.0;
             }
+            // no else — freeze integral when outside threshold
 
-            // Derivative (on error)
-            derivative = error - prev_error;
+            // Derivative uses raw error so it tapers smoothly into deadband
+            derivative = raw_error - prev_error;
 
             // --------------------------------
             // PICK CONSTANT SET
@@ -87,14 +87,6 @@ namespace lynx {
             const constants& c = (std::fabs(error) < refined_range)
                 ? refined_constants
                 : general_constants;
-
-            // if (std::fabs(error) < refined_range) {
-            //     // Inside refined zone, start settle timer
-            //     settle_timer.start();
-            // } else {
-            //     // If you want: reset timer when far away
-            //     // settle_timer.reset();
-            // } --> COVERED BY MOTION ALGORITHM (ALREADY STARTS IT)
 
             // --------------------------------
             // RAW PID OUTPUT
@@ -104,7 +96,7 @@ namespace lynx {
                                         c.kD * derivative);
 
             // --------------------------------
-            // SLEW LIMITING (USE PREV_SPEED CORRECTLY)
+            // SLEW LIMITING
             // --------------------------------
             double delta_speed = raw_speed - prev_speed;
             if (delta_speed > slew) {
@@ -121,7 +113,7 @@ namespace lynx {
             speed = std::clamp(speed, -127.0 * scale, 127.0 * scale);
 
             // Update history
-            prev_error = error;
+            prev_error = raw_error; // track raw error for next derivative calculation
             prev_speed = speed;
 
             return speed;
