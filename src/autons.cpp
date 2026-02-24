@@ -11,8 +11,8 @@ void solo_awp_right(){
 
     chassis.purePursuit(lynx::path({
         {0, 0, 0.0, 100},
-        {24, 16, 90, 100},
-        {48, 32, 0, 100}
+        {5.26, 19.75, 34.1, 100},
+        {30.01, 30.25, 93.2, 100}
     }, 0.4, 0.5), 5000);
 }
 
@@ -26,25 +26,11 @@ void half_left_red(){
 void half_left_blue(){
     queue.start();
     odom.reset(0, 0, 0);
-
-    chassis.straight(24);
-    chassis.turn_abs(90);
-    chassis.straight(24);
-    chassis.turn_abs(180);
-    chassis.straight(24);
-    chassis.turn_abs(-90);
-    chassis.straight(24);
-    chassis.turn_abs(0);
-
-
-    // std::vector<lynx::Waypoint> path1 = {
-    //     lynx::Waypoint(0, 0, 0, 100),
-    //     lynx::Waypoint(0, 24, 0, 100)
-    // };
-
-    
-
-    // chassis.purePursuit(path1);
+    chassis.purePursuit(lynx::path({
+        {0, 0, 357.5, 65},
+        {23.51, 24.25, 90, 65},
+        {48.01, 48, 26.9, 65}
+    }, 0.4, 0.5), 5000);
 }
 
 void half_right_red(){

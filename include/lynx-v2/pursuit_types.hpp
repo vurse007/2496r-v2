@@ -30,23 +30,39 @@ struct Waypoint {
 // PURE PURSUIT PARAMETERS - Centralized tuning
 // ============================================================================
 struct PursuitParams {
+    //chat powered tuning:
+    double base_lookahead = 12;
+    double min_lookahead = 7;
+    double max_lookahead = 20;
+    double curvature_scale = 2;
+
+    double heading_kp = 0.65;
+    double heading_blend_dist = 15;
+    double heading_blend_power = 1.6;
+
+
     // Lookahead parameters
-    double base_lookahead = 1.0;        // Base lookahead distance (inches)
-    double min_lookahead = 5.0;          // Minimum lookahead (sharp turns)
-    double max_lookahead = 12.0;         // Maximum lookahead (straight paths)
-    double curvature_scale = 2.0;        // How much curvature affects lookahead
+    // double base_lookahead = 10.0;        // Base lookahead distance (inches)
+    // double min_lookahead = 5.0;          // Minimum lookahead (sharp turns)
+    // double max_lookahead = 16.0;         // Maximum lookahead (straight paths)
+    // double curvature_scale = 8;        // How much curvature affects lookahead
     
-    // Heading control parameters
-    double heading_kp = 0.8;             // Heading correction gain
-    double heading_blend_dist = 10.0;     // Distance to start blending heading
-    double heading_blend_power = 1.5;    // Exponential blend curve (higher = later blend)
+    // // Heading control parameters
+    // double heading_kp = 0.8;             // Heading correction gain
+    // double heading_blend_dist = 10.0;     // Distance to start blending heading
+    // double heading_blend_power = 1.5;    // Exponential blend curve (higher = later blend)
     
     // Path following parameters
-    double path_completion_dist = 2.0;   // Distance to consider path complete (inches)
+    double path_completion_dist = 1.5;   // Distance to consider path complete (inches)
     double final_heading_tolerance = 0.5; // Final heading tolerance (degrees)
     
+    // Terminal handoff parameters
+    double terminal_dist = 4.0;          // Distance to trigger PID handoff (inches)
+    int terminal_straight_timeout = 500; // Timeout for final straight correction (ms)
+    int terminal_turn_timeout = 500;     // Timeout for final heading snap (ms)
+    
     // Settling parameters
-    int settle_count_target = 6;         // Number of cycles to be settled (8 * 5ms = 40ms)
+    int settle_count_target = 60;         // Number of cycles to be settled (8 * 5ms = 40ms)
     
     PursuitParams() = default;
 };

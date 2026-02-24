@@ -160,6 +160,33 @@ namespace lynx {
          * Returns the intersection of the lookahead circle with the path
          */
         std::pair<bool, point> findLookaheadPoint(const point& robot_pos, double lookahead) {
+            // Advance current_segment_idx based on robot's actual projection
+            // along path segments — NOT where the lookahead circle intersects.
+            while (current_segment_idx < (int)path.size() - 2) {
+                point curr_wp = Waypoint_to_point(path[current_segment_idx]);
+                point next_wp = Waypoint_to_point(path[current_segment_idx + 1]);
+
+                double seg_dx = next_wp.x - curr_wp.x;
+                double seg_dy = next_wp.y - curr_wp.y;
+                double seg_len_sq = seg_dx * seg_dx + seg_dy * seg_dy;
+
+                if (seg_len_sq < 0.0001) {
+                    current_segment_idx++;
+                    continue;
+                }
+
+                double robot_dx = robot_pos.x - curr_wp.x;
+                double robot_dy = robot_pos.y - curr_wp.y;
+                double proj = (robot_dx * seg_dx + robot_dy * seg_dy) / seg_len_sq;
+
+                if (proj >= 1.0) {
+                    current_segment_idx++;
+                } else {
+                    break;
+                }
+            }
+
+            // Search for the furthest lookahead intersection from current segment onward
             bool found_intersection = false;
             point best_intersection(0, 0);
             int best_segment = current_segment_idx;
@@ -192,24 +219,6 @@ namespace lynx {
             }
             
             if (found_intersection) {
-                current_segment_idx = best_segment;
-                
-            // --- Robust segment progression ---
-                if (best_segment < (int)path.size()-1) {
-
-                    point curr_wp = Waypoint_to_point(path[best_segment]);
-                    point next_wp = Waypoint_to_point(path[best_segment + 1]);
-
-                    double dist_curr = robot_pos.distance_to(curr_wp);
-                    double dist_next = robot_pos.distance_to(next_wp);
-
-                    // Advance when robot is closer to next waypoint
-                    if (dist_next < dist_curr) {
-                        current_segment_idx = best_segment + 1;
-                    }
-                }
-
-                
                 return {true, best_intersection};
             }
             
@@ -372,12 +381,13 @@ namespace lynx {
                 // signed distance along robot forward axis
                 double forward_proj = dxF * fwd_x + dyF * fwd_y;
 
-                // Tune this (inches). Should be a bit larger than your settle dist.
-                const double TERMINAL_DIST = std::max(5.0, params.path_completion_dist * 1.5);
+                const double TERMINAL_DIST = std::max(params.terminal_dist, params.path_completion_dist * 1.5);
 
                 // If we're close enough OR we've passed the final plane (forward_proj < 0),
                 // stop pursuit and let PID finish cleanly.
-                if (dist_to_final < TERMINAL_DIST || forward_proj < -1.0) {
+                bool on_last_segment = (current_segment_idx >= (int)path.size() - 2);
+                bool near_end = (dist_to_final < params.base_lookahead * 2.0);
+                if (dist_to_final < TERMINAL_DIST || (on_last_segment && near_end && forward_proj < -1.0)) {
                     do_terminal_handoff = true;
                     terminal_signed_forward = forward_proj;     // can be negative -> reverse
                     terminal_heading_deg = path.back().heading; // IMU degrees
@@ -457,11 +467,10 @@ namespace lynx {
             // TERMINAL PID SETTLE (your trusted code)
             // ============================================================
             if (do_terminal_handoff) {
-                // Drive signed distance to final (negative -> reverse)
-                global::chassis.straight(terminal_signed_forward, 200, 1.0);
+                global::chassis.straight(terminal_signed_forward, params.terminal_straight_timeout, 1.0);
 
-                // Then lock final heading
-                global::chassis.turn_abs(terminal_heading_deg, 300, 1.0);
+                double raw_heading = std::fmod(terminal_heading_deg + global::odom.imu_heading_offset_deg + 360.0, 360.0);
+                global::chassis.turn_abs(raw_heading, params.terminal_turn_timeout, 1.0);
             }
         }
 
