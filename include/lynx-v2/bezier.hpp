@@ -291,15 +291,12 @@ public:
 // ============================================================================
 // FREE FUNCTION - lynx::path({...})
 //
-// This is a brand new function, completely separate from purePursuit() or
-// anything in chassis.hpp. It just generates the Waypoint vector you pass
-// into purePursuit() as an argument. Nothing existing is bypassed or changed.
 //
 // Usage:
 //   chassis.purePursuit(lynx::path({
 //       {x, y, heading, velocity},
 //       ...
-//   }), timeout, params);
+//   }), timeout);
 // ============================================================================
 inline std::vector<Waypoint> path(
     std::initializer_list<BezierPath::ControlPoint> pts,
