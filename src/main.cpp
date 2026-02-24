@@ -100,7 +100,6 @@ void opcontrol() {
 
         driverCon();
         autonCon();
-
         // lynx::util::print_info(
         //     driver_time.elapsed(), 
         //     &global::con, 

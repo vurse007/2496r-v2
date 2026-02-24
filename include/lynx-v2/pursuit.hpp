@@ -422,10 +422,14 @@ namespace lynx {
                 double omega_heading = calculateHeadingCorrection(robot_pos);
 
                 double omega_total_imu;
-                if (dist_to_final < 4.0) {
-                    omega_total_imu = omega_heading * 2.0 + omega_pursuit * 0.2;
-                } else if (dist_to_final < 8.0) {
-                    omega_total_imu = omega_heading * 1.5 + omega_pursuit * 0.5;
+
+                // If we're on the final segment, prioritize heading strongly
+                on_last_segment = (current_segment_idx >= (int)path.size() - 2);
+
+
+                if (on_last_segment) {
+                    // Heading dominates final approach
+                    omega_total_imu = omega_heading * 16.0;
                 } else {
                     omega_total_imu = omega_pursuit + omega_heading;
                 }

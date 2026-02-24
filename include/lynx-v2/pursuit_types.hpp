@@ -36,9 +36,9 @@ struct PursuitParams {
     double max_lookahead = 20;
     double curvature_scale = 2;
 
-    double heading_kp = 0.65;
+    double heading_kp = 2.7; // 0.65
     double heading_blend_dist = 15;
-    double heading_blend_power = 1.6;
+    double heading_blend_power = 1.5;
 
 
     // Lookahead parameters
@@ -54,7 +54,7 @@ struct PursuitParams {
     
     // Path following parameters
     double path_completion_dist = 1.5;   // Distance to consider path complete (inches)
-    double final_heading_tolerance = 0.5; // Final heading tolerance (degrees)
+    double final_heading_tolerance = 0.1; // Final heading tolerance (degrees)
     
     // Terminal handoff parameters
     double terminal_dist = 4.0;          // Distance to trigger PID handoff (inches)
