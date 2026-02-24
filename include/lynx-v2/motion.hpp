@@ -66,13 +66,21 @@ inline void lynx::drive::straight(double target, int timeout, double scale) {
 
         // Settle logic
         if (std::fabs(target - curr_pos) <= drive_pid.refined_range) {
-            drive_pid.settle_timer.start();
+            if (!drive_pid.settle_timer.running)
+                drive_pid.settle_timer.start();
+        } else {
+            if (drive_pid.settle_timer.running)
+                drive_pid.settle_timer.reset();
         }
 
-        if (drive_pid.settle_timer.has_elapsed(drive_pid.settle_timer_target)) break;
+        if (drive_pid.settle_timer.running &&
+            drive_pid.settle_timer.has_elapsed(drive_pid.settle_timer_target))
+        {
+            break;
+        }
         if (safety_timer.has_elapsed()) break;
 
-        pros::delay(5);
+        pros::delay(10);
     }
     global::chassis.move(0, 0);
 }
@@ -139,7 +147,7 @@ inline void lynx::drive::turn_abs(double target, int timeout, double scale) {
         if (timeout > 0 && safety_timer.has_elapsed())
             break;
 
-        pros::delay(5);
+        pros::delay(10);
     }
 
     global::chassis.move(0, 0);

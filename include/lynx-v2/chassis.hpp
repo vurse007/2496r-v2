@@ -113,25 +113,25 @@ namespace lynx {
             //     10000
 
             PID turn_pid{
-                {6.7, 0.01, 70},      // general_constants: kp, ki, kd
-                {5.6, 0, 105},      // refined_constants
-                7,                // refined_range
+                {6, 0.0001, 48},      // general_constants: kp, ki, kd
+                {6, 0.0001, 48},      // refined_constants
+                3,                // refined_range
                 127,               // slew
-                30,                 // integral_threshold
+                7,                 // integral_threshold
                 200,                // max_integral
                 0,                  // deadband
-                10000
+                50
             };
 
             PID drive_pid{
-                {17, 0.0001, 290},      // general_constants: kp, ki, kd
-                {0, 0, 0},      // refined_constants
-                0,                // refined_range
+                {10, 0.0001, 15},      // general_constants: kp, ki, kd
+                {10, 0.0001, 15},      // refined_constants
+                3,                // refined_range
                 127,               // slew
-                30,                 // integral_threshold
+                7,                 // integral_threshold
                 200,                // max_integral
                 0,                  // deadband
-                10000                  // settle_timer_target (8 checks * 5ms)
+                200                  // settle_timer_target (8 checks * 5ms)
             };
 
             drive(const std::vector<motor_specs>& ls, const std::vector<motor_specs>& rs, const double wd, const double egr, const double tw, pros::Imu* imu, pros::Rotation* distance_pod):

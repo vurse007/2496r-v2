@@ -31,7 +31,7 @@ struct Waypoint {
 // ============================================================================
 struct PursuitParams {
     // Lookahead parameters
-    double base_lookahead = 8.0;        // Base lookahead distance (inches)
+    double base_lookahead = 1.0;        // Base lookahead distance (inches)
     double min_lookahead = 5.0;          // Minimum lookahead (sharp turns)
     double max_lookahead = 12.0;         // Maximum lookahead (straight paths)
     double curvature_scale = 2.0;        // How much curvature affects lookahead

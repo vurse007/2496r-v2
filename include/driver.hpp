@@ -47,7 +47,7 @@ inline void printTemps(){
     lynx::util::print_info(
         pros::millis(),
         &global::con,
-        std::vector<std::string>{"ChasRT", "ChasLT", "IntRT", "IntLT"},
+        std::vector<std::string>{"CRT", "CLT", "RT", "LT"},
         std::vector<double>{global::chassis.right.get_avg_temp(), global::chassis.left.get_avg_temp(), global::chassis.get_extra_temp(0), global::chassis.get_extra_temp(1)}
     );
 }
@@ -113,6 +113,6 @@ inline void driverCon(){
     driver();
     intakeCon();
     stateCon();
-    //printTemps();
+    printTemps();
 }
 
