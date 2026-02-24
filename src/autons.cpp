@@ -19,8 +19,6 @@ void solo_awp_right(){
 void half_left_red(){
     queue.start();
     delay(300);
-    //global::chassis.turn_abs(90, 3000);
-    global::chassis.straight(24);
 }
 
 void half_left_blue(){
@@ -109,8 +107,8 @@ void skills_auton(){
         {80, -101, -90, 35},
         {70, -101, -86, 50},
         {20, -100, -86, 50},
-        {10, -70.5, -40, 65},
-        {0, -70.5, -90, 45}
+        {10, -60.5, -40, 65},
+        {0, -60.5, -90, 45}
     }));
 
     chassis.turn_abs(-91, 200);
@@ -131,14 +129,11 @@ void skills_auton(){
     delay(2000);
     chassis.straight(5, 800, 0.65);
 
-
-
-
-
-    
-
-
-    
+    chassis.purePursuit(lynx::path({
+        {0, -60.5, -90.0, 60},
+        {-9.3, -45.4, 0.0, 45},
+        {-16.3, -22.6, 0.0, 75}
+    }, 0.2, 0.5), 5000);
 }
 
 void blank(){
