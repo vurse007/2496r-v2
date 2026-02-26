@@ -178,8 +178,14 @@ inline void stateCon(){
     }
     
     if (global::con.get_digital_new_press(DIGITAL_RIGHT)) global::matchLoaderP.toggle();
-
-    global::wingPiston.set_value(!global::con.get_digital(DIGITAL_L1));
+    static bool firstToggle = false;
+    if (firstToggle){global::wingPiston.set_value(!global::con.get_digital(DIGITAL_L1));}
+    else{
+        if(global::con.get_digital(DIGITAL_L1)){
+            firstToggle = true;
+        }
+    }
+    
 }
 
 inline void otherCon(){

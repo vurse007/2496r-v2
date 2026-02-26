@@ -50,11 +50,64 @@ void half_left_red(){
 void half_left_blue(){
     queue.start();
     odom.reset(0, 0, 0);
-    chassis.purePursuit(lynx::path({
-        {0, 0, 357.5, 65},
-        {23.51, 24.25, 90, 65},
-        {48.01, 48, 26.9, 65}
-    }, 0.4, 0.5), 5000);
+    chassis.straight(32, 1200, 0.7);
+    delay(50);
+    chassis.turn_abs(-90, 600);
+    global::matchLoaderP.set_value(true);
+    delay(200);
+    chassis.move_intake(127);
+    chassis.straight(22, 900, 0.35);
+    delay(350);
+    queue.schedule_delay(300, []() {
+        chassis.move_intake(0);
+    });
+    chassis.straight(-31, 900, 0.55);
+    chassis.move_intake(-127);
+    queue.schedule_delay(300, []() {
+        chassis.straight(-3, 300);
+    });
+    delay(50);
+    global::set_intake(global::intakeState::HIGH_GOAL);
+    chassis.move_intake(127);
+    delay(1350);
+    global::matchLoaderP.set_value(false);
+    chassis.straight(19, 800, 0.65);
+    delay(100);
+    chassis.turn_abs(136, 800);
+    global::set_intake(global::intakeState::STORAGE);
+    delay(200);
+
+    chassis.straight(30, 900, 0.65);
+    global::matchLoaderP.set_value(true);
+    delay(1000);
+    global::matchLoaderP.set_value(false);
+
+    chassis.turn_abs(-41, 900);
+    delay(100);
+    chassis.straight(-21, 800, 0.60);
+    chassis.move_intake(-127);
+    delay(25);    
+    global::set_intake(global::intakeState::MID_GOAL);
+    chassis.move_intake(127);
+    delay(1000);
+    chassis.turn_abs(-41, 300);
+    chassis.straight(32, 1000, 0.65);
+    delay(300);
+    chassis.turn_abs(-90, 800, 0.95);
+    chassis.move_intake(0);
+
+    global::wingPiston.set_value(false);
+    queue.schedule_delay(500, []() {
+        chassis.set_state(DriveState::CHASSIS_8);
+    });
+    chassis.set_brake_mode(MOTOR_BRAKE_HOLD);
+
+    chassis.straight(-25, 2500, 0.55);
+
+
+
+
+
 }
 
 void half_right_red(){
@@ -207,7 +260,7 @@ Auton skills         ("Skills       ", "Red   ", skills_auton,     "red");
 Auton noAuto         ("BLANK        ", "Red   ", blank,            "red");
 
 std::vector<Auton> autons = {
-    skills, autonHalfLBlue, soloAwp, autonHalfLRed, 
+    autonHalfLBlue, skills, soloAwp, autonHalfLRed, 
     autonHalfRRed, autonHalfRBlue, 
     noAuto
 }; 

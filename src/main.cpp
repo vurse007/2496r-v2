@@ -96,6 +96,8 @@ void opcontrol() {
 
     while (true) {      
         global::odom.update();
+        global::chassis.set_brake_mode(MOTOR_BRAKE_COAST);
+
         //global::colorSort.update();
 
         driverCon();
