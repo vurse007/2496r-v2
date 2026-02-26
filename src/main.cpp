@@ -100,12 +100,12 @@ void opcontrol() {
 
         driverCon();
         autonCon();
-        // lynx::util::print_info(
-        //     driver_time.elapsed(), 
-        //     &global::con, 
-        //     {"X", "Y", "Imu"}, 
-        //     {odom.current_pos.x, odom.current_pos.y, lynx::util::to_deg(odom.current_pos.theta)}
-        // );
+        lynx::util::print_info(
+            driver_time.elapsed(), 
+            &global::con, 
+            {"X", "Y", "Imu"}, 
+            {odom.current_pos.x, odom.current_pos.y, lynx::util::to_deg(odom.current_pos.theta)}
+        );
 
     counter += 1;
     pros::delay(5);
