@@ -18,7 +18,33 @@ void solo_awp_right(){
 
 void half_left_red(){
     queue.start();
-    delay(300);
+    global::chassis.move_intake(127);
+    chassis.purePursuit(lynx::path({
+    {0, 0, 0.0, 75},
+    // {2, 5, -15, 75},
+    {-2, 28, -90, 45}
+    }, 0.4, 0.5), 2000);
+    global::matchLoaderP.set_value(true);
+    delay(600);
+    chassis.turn_abs(-90);
+    chassis.move_intake(127);
+    chassis.straight(10.67, 700, 0.75);
+    delay(350);
+    chassis.turn_abs(-91, 300);
+    chassis.move_intake(0);
+    chassis.straight(-31, 900, 0.75);
+    chassis.move_intake(-127);
+    delay(50);
+    chassis.move_intake(127);
+    global::set_intake(global::intakeState::HIGH_GOAL);
+    delay(1400);
+    chassis.purePursuit(lynx::path({
+        {7, 28, -90, 55},
+        {8, 10, -180, 45},
+        {17, 3, 135, 35}
+    }, 0.4, 0.5), 3000);
+
+
 }
 
 void half_left_blue(){
@@ -33,6 +59,31 @@ void half_left_blue(){
 
 void half_right_red(){
     queue.start();
+    global::chassis.move_intake(127);
+    chassis.purePursuit(lynx::path({
+    {0, 0, 0.0, 75},
+    // {2, 5, -15, 75},
+    {-2, 28, 90, 45}
+    }, 0.4, 0.5), 2000);
+    global::matchLoaderP.set_value(true);
+    delay(600);
+    chassis.turn_abs(90);
+    chassis.move_intake(127);
+    chassis.straight(10.67, 700, 0.75);
+    delay(500);
+    chassis.turn_abs(91, 300);
+    chassis.move_intake(0);
+    chassis.straight(-31, 900, 0.75);
+    chassis.move_intake(-127);
+    delay(50);
+    chassis.move_intake(127);
+    global::set_intake(global::intakeState::HIGH_GOAL);
+    delay(1400);
+    chassis.purePursuit(lynx::path({
+        {-7, 28, -90, 55},
+        {-8, 10, -180, 45},
+        {-17, 3, 135, 35}
+    }, 0.4, 0.5), 3000);
 }
 
 void half_right_blue(){
@@ -60,14 +111,15 @@ void skills_auton(){
     chassis.turn_abs(15);
     chassis.purePursuit(lynx::path({
         {-13, 39, 90, 45},
-        {3, 39, 75, 35},
-        {20, 39, 75, 50},
-        {73, 41.5, 75, 45},
-        {82, 29.25, 110, 35},
-        {85, 29, 90, 35}
+        {3, 40, 70, 35},
+        {20, 42.5, 70, 45},
+        {85, 44.5, 70, 45},
+        {86, 33.5, 120, 50},
+        {86, 32.5, 120, 50},
+        {89, 28, 180, 50}
     }), 5000);
-    chassis.turn_abs(91, 200);
-    chassis.straight(-14, 900, 0.95);
+    chassis.turn_abs(91, 600);
+    chassis.straight(-16, 900, 0.75);
     chassis.turn_abs(91, 200);
 
     global::set_intake(global::intakeState::HIGH_GOAL);
@@ -75,38 +127,40 @@ void skills_auton(){
     global::matchLoaderP.set_value(true);
     chassis.turn_abs(88, 400);
     delay(10);
-    chassis.straight(16, 600, 0.65);
+    chassis.straight(22, 800, 0.45);
     global::set_intake(global::intakeState::STORAGE);
     delay(2500);
 
-    chassis.turn_abs(94, 300);
-    chassis.straight(-22, 1000, 0.55);
+    chassis.turn_abs(93.25, 300);
+    chassis.straight(-27, 1000, 0.55);
     global::set_intake(global::intakeState::HIGH_GOAL);
     delay(2000);
-    chassis.straight(5, 800, 0.65);
+    chassis.straight(10, 900, 0.65);
     chassis.turn_abs(180, 600);
     global::matchLoaderP.set_value(false);
     chassis.purePursuit(lynx::path({
-        {83, 0, -180, 65},
-        {83, -63, -180, 65},
-    }));
+        {97, 0, -180, 65},
+        //{92, -45, -140, 65},
+        {95, -61, -180, 45},
+    }, 0.8), 6000);
     global::matchLoaderP.set_value(true);
     chassis.turn_abs(90, 600);
     //chassis.move_intake(127);
-    chassis.straight(17, 900, 0.35);
+    chassis.straight(20, 900, 0.35);
     delay(2500);
+
+    // ~
 
     chassis.straight(-5, 900, 0.95);
     global::matchLoaderP.set_value(false);
     global::wingPiston.set_value(true);
 
-    chassis.turn_abs(-165);
+    chassis.turn_abs(-175);
 
     chassis.purePursuit(lynx::path({
-        {93, -101, -90, 65},
-        {80, -101, -90, 35},
-        {70, -101, -86, 50},
-        {20, -100, -86, 50},
+        {80, -90, -90, 55},
+        {70, -95, -90, 50},
+        {20, -76, -90, 50},
         {10, -60.5, -40, 65},
         {0, -60.5, -90, 45}
     }));
