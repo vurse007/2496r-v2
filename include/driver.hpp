@@ -138,7 +138,7 @@ inline void intakeCon(){
         global::set_intake(global::intakeState::MID_GOAL);
         manualIntakeRamp = 2;
         global::chassis.set_state(lynx::DriveState::CHASSIS_6_INTAKE_2);
-        global::chassis.move_intake(127);
+        global::chassis.move_intake(100);
         return;
     }
 
@@ -196,6 +196,6 @@ inline void driverCon(){
     driver();
     intakeCon();
     stateCon();
-    //printTemps();
+    printTemps();
 }
 

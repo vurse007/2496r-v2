@@ -9,7 +9,7 @@ namespace global {
 
     inline pros::Rotation horizontal_pod(-6);
     inline pros::Rotation vertical_pod(5);
-    inline pros::Imu imu(21);
+    inline pros::Imu imu(15);
     inline pros::adi::Pneumatics matchLoaderP('H', false);
     inline pros::Controller con(pros::E_CONTROLLER_MASTER);
     
