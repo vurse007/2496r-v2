@@ -9,12 +9,12 @@ using global::con;
 void solo_awp_right(){
     queue.start();
     odom.reset(0, 0, 0);
-    chassis.straight(32, 1200, 0.6);
+    chassis.straight(32.25, 1200, 0.6);
     global::matchLoaderP.set_value(true);
     chassis.turn_abs(90, 600);
     chassis.move_intake(127);
-    chassis.straight(22.5, 800, 0.35);
-    delay(150);
+    chassis.straight(22.5, 900, 0.35);
+    delay(400);
     queue.schedule_delay(800, []() {
         chassis.move_intake(0);
     });
@@ -49,7 +49,7 @@ void solo_awp_right(){
     // });
     chassis.straight(28, 900, 0.65);
     delay(25);
-    chassis.turn_abs(185, 800);
+    chassis.turn_abs(176, 1000);
     delay(25);
     queue.schedule_delay(900, []() {
         global::matchLoaderP.set_value(true);
@@ -58,27 +58,27 @@ void solo_awp_right(){
         global::matchLoaderP.set_value(false);
     });
     
-    chassis.straight(38, 1200, 0.7);
+    chassis.straight(43, 1200, 0.7);
     // delay(50);
     chassis.turn_abs(133, 900);
     // delay(50);
-    chassis.straight(-18.75, 800, 0.70);
+    chassis.straight(-17.25, 800, 0.70);
     chassis.move_intake(-127);
     global::set_intake(global::intakeState::MID_GOAL);
     chassis.move_intake(127);
-    delay(175);
+    delay(300);
     chassis.turn_abs(139, 300);
     chassis.move_intake(0);
     global::set_intake(global::intakeState::STORAGE);
 
-    chassis.straight(39.5, 1100, 0.55);
+    chassis.straight(49.5, 1500, 0.55);
     delay(75);
     global::matchLoaderP.set_value(true);
 
     chassis.turn_abs(90, 800);
     chassis.move_intake(127);
-    chassis.straight(27, 900, 0.35);
-    delay(185);
+    chassis.straight(28, 900, 0.35);
+    delay(400);
     queue.schedule_delay(800, []() {
         chassis.move_intake(0);
     });
@@ -285,12 +285,12 @@ void half_left_blue(){
     chassis.move_intake(0);
 
     global::wingPiston.set_value(false);
-    queue.schedule_delay(500, []() {
-        chassis.set_state(DriveState::CHASSIS_8);
-    });
+    // queue.schedule_delay(500, []() {
+    //     chassis.set_state(DriveState::CHASSIS_8);
+    // });
     chassis.set_brake_mode(MOTOR_BRAKE_HOLD);
 
-    chassis.straight(-25, 2500, 0.55);
+    chassis.straight(-24, 2500, 0.55);
 
     // queue.start();
     // odom.reset(0, 0, 0);
@@ -395,7 +395,7 @@ void half_right_red(){
 void half_right_blue(){
     queue.start();
     odom.reset(0, 0, 0);
-    chassis.straight(31, 1200, 0.7);
+    chassis.straight(31.25, 1200, 0.7);
     delay(50);
     chassis.turn_abs(90, 600);
     global::matchLoaderP.set_value(true);
@@ -414,8 +414,8 @@ void half_right_blue(){
     delay(50);
     global::set_intake(global::intakeState::HIGH_GOAL);
     chassis.move_intake(127);
-    delay(1350);
     chassis.turn_abs(90);
+    delay(1350);
     global::matchLoaderP.set_value(false);
     chassis.straight(15, 800, 0.65);
     delay(100);
@@ -430,22 +430,22 @@ void half_right_blue(){
 
     //chassis.turn_abs(-142, 900);
     delay(100);
-    chassis.straight(17.5, 800, 0.60);
+    chassis.straight(12.5, 800, 0.60);
     // chassis.turn_abs(-149, 300);
     chassis.move_intake(-127);
     delay(1000);
     chassis.turn_abs(-136, 300);
     global::matchLoaderP.set_value(false);
 
-    chassis.straight(-31, 1000, 0.65);
+    chassis.straight(-32, 1000, 0.65);
     delay(400);
     chassis.turn_abs(-90, 800, 0.95);
     chassis.move_intake(0);
 
     global::wingPiston.set_value(false);
-    queue.schedule_delay(500, []() {
-        chassis.set_state(DriveState::CHASSIS_8);
-    });
+    // queue.schedule_delay(500, []() {
+    //     chassis.set_state(DriveState::CHASSIS_8);
+    // });
     chassis.set_brake_mode(MOTOR_BRAKE_HOLD);
 
     chassis.straight(25, 2500, 0.55);
@@ -467,10 +467,10 @@ void skills_auton(){
     global::matchLoaderP.set_value(true);
     delay(400);
     chassis.move_intake(127);
-    chassis.straight(16, 900, 0.35);
+    chassis.straight(23, 900, 0.35);
     delay(2500);
 
-    chassis.straight(-5, 900, 0.95);
+    chassis.straight(-6, 900, 0.95);
     global::matchLoaderP.set_value(false);
 
     chassis.turn_abs(15);
@@ -489,7 +489,7 @@ void skills_auton(){
     delay(100);
     chassis.straight(35, 1000, 0.55);
     chassis.turn_abs(0, 600);
-    chassis.straight(5, 900, 0.55);
+    chassis.straight(5, 900, 0.55); //wr1
     chassis.move_intake(0);
 
     chassis.straight(-12.75, 800, 0.65);
@@ -505,16 +505,16 @@ void skills_auton(){
     delay(50);
     chassis.move_intake(127);
 
-    delay(2000);
+    delay(2000); //dump2
     global::matchLoaderP.set_value(true);
     chassis.turn_abs(90, 600);
     delay(10);
-    chassis.straight(35.5, 1000, 0.375);
+    chassis.straight(40.5, 1000, 0.375);
     global::set_intake(global::intakeState::STORAGE);
     delay(100);
     chassis.turn_abs(90, 600);
 
-    chassis.straight(5, 800, 0.75);
+    chassis.straight(7, 900, 0.75);
     delay(2000);
 
 
@@ -543,12 +543,12 @@ void skills_auton(){
     global::matchLoaderP.set_value(true);
     chassis.turn_abs(90, 900, 0.75);
     chassis.move_intake(127);
-    chassis.straight(25, 900, 0.40);
+    chassis.straight(30, 900, 0.40);
     delay(100);
-    chassis.straight(5, 800, 0.75);
+    chassis.straight(7, 800, 0.75);
     delay(2500);
 
-    chassis.straight(-5, 900, 0.95);
+    chassis.straight(-6, 900, 0.95);
     global::matchLoaderP.set_value(false);
     global::wingPiston.set_value(true);
 
@@ -557,7 +557,7 @@ void skills_auton(){
 
 
     chassis.straight(18, 800, 0.55);
-    chassis.straight(-1.5, 700);
+    chassis.straight(-1.25, 700);
     chassis.turn_abs(-90, 1500);
     chassis.straight(92, 3000, 0.55);
     chassis.turn_abs(180, 800);
@@ -566,11 +566,12 @@ void skills_auton(){
     chassis.straight(5, 900, 0.55);
     chassis.move_intake(0);
 
-    chassis.straight(-12.75, 800, 0.65);
-    chassis.turn_abs(-90, 800);
+    chassis.straight(-12, 1000, 0.65);
+    delay(50);
+    chassis.turn_abs(-90, 1000);
     global::set_intake(global::intakeState::HIGH_GOAL);
 
-    chassis.straight(-22.5, 900, 0.70);
+    chassis.straight(-23.5, 900, 0.70);
     delay(100);
     chassis.turn_abs(-90, 800, 3);
     chassis.straight(-3, 900, 1);
@@ -599,14 +600,14 @@ void skills_auton(){
 
     });
 
-    chassis.straight(28, 1000, 0.45);
+    chassis.straight(33, 1000, 0.45);
     delay(50);
-    chassis.straight(5, 800, 0.65);
+    chassis.straight(7, 800, 0.65);
 
     delay(2500);
 
     chassis.turn_abs(-87.5, 800);
-    chassis.straight(-27, 1000, 0.45);
+    chassis.straight(-29, 1000, 0.45);
     global::set_intake(global::intakeState::HIGH_GOAL);
     delay(2000);
     chassis.straight(5, 800, 0.65);
@@ -627,12 +628,12 @@ void skills_auton(){
     queue.schedule_delay(200, [](){
         chassis.set_state(DriveState::CHASSIS_8);
     });
-    chassis.straight(24, 1000, 0.55);
+    chassis.straight(26, 1000, 0.55);
     chassis.turn_abs(-2, 800);
-    queue.schedule_delay(800, [](){
+    queue.schedule_delay(200, [](){
         global::matchLoaderP.set_value(true);
     });
-    chassis.straight(27, 2000);
+    chassis.straight(40, 2000);
     delay(1000);
 }
 

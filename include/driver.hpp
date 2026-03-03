@@ -128,9 +128,10 @@ inline void intakeCon(){
 
     if (global::con.get_digital(DIGITAL_R1)){
         global::set_intake(global::intakeState::STORAGE);
-        manualIntakeRamp = 0;
-        global::chassis.set_state(lynx::DriveState::CHASSIS_6_INTAKE_2);
         global::chassis.move_intake(127);
+        manualIntakeRamp = 0;
+
+        global::chassis.set_state(lynx::DriveState::CHASSIS_6_INTAKE_2);
         return;
     }
 
@@ -138,7 +139,7 @@ inline void intakeCon(){
         global::set_intake(global::intakeState::MID_GOAL);
         manualIntakeRamp = 2;
         global::chassis.set_state(lynx::DriveState::CHASSIS_6_INTAKE_2);
-        global::chassis.move_intake(100);
+        global::chassis.move_intake(127);
         return;
     }
 
